@@ -1,0 +1,195 @@
+.ra-page {
+  min-height: 100vh;
+  background: var(--semantic-color-background-1);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ===== 상단 바 ===== */
+.ra-topbar {
+  height: 51px;
+  padding: 0 32px;
+  border-bottom: 1px solid #E0E0E0;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+/* ===== 탭 바 ===== */
+.ra-tabs-bar {
+  padding: 0 32px;
+  background: #FFFFFF;
+  flex-shrink: 0;
+}
+
+/* ===== 테이블 래퍼 ===== */
+.ra-table-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+/* ===== 필터 행 ===== */
+.ra-filter-row {
+  height: 56px;
+  padding: 12px 32px;
+  border-bottom: 1px solid #E0E0E0;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+/* ===== 테이블 ===== */
+.ra-table-container {
+  overflow-x: auto;
+  min-width: 0;
+  width: 100%;
+}
+
+.ra-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1160px;
+  table-layout: fixed;
+}
+
+/* 컬럼 너비 */
+.ra-col-name     { width: 280px; }
+.ra-col-status   { width: 120px; }
+.ra-col-campaign { width: 260px; }
+.ra-col-period   { width: 170px; }
+.ra-col-product  { width: 100px; }
+.ra-col-brand    { width: 100px; }
+.ra-col-upload   { width: 130px; }
+
+/* 테이블 헤더 */
+.ra-table thead tr {
+  background: #FAFAFA;
+}
+
+.ra-table th {
+  height: 36px;
+  padding: 0 10px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 400;
+  color: #424242;
+  line-height: 18px;
+  white-space: nowrap;
+  border-right: 1px solid #F0F0F0;
+  border-bottom: 1px solid #F0F0F0;
+  vertical-align: middle;
+}
+
+.ra-table th:last-child {
+  border-right: none;
+}
+
+/* ===== Sticky 첫 번째 컬럼 ===== */
+.ra-sticky-first th:first-child,
+.ra-sticky-first td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  border-right: 1px solid #D2D2D2;
+}
+
+.ra-sticky-first thead th:first-child {
+  background: #FAFAFA;
+  z-index: 3;
+}
+
+.ra-sticky-first td:first-child {
+  background: #FFFFFF;
+}
+
+.ra-sticky-first .ra-tr:hover td:first-child {
+  background: #FAFAFA;
+}
+
+/* 테이블 행 */
+.ra-table td {
+  height: 64px;
+  padding: 0 10px;
+  border-bottom: 1px solid #F0F0F0;
+  border-right: 1px solid #F0F0F0;
+  vertical-align: middle;
+  font-size: 12px;
+  font-weight: 400;
+  color: #424242;
+}
+
+.ra-table td:last-child {
+  border-right: none;
+}
+
+.ra-tr:hover td {
+  background: #FAFAFA;
+}
+
+/* 자동화명 셀 */
+.ra-td-name {
+  padding: 8px 10px;
+}
+
+.ra-name-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: #242424;
+  line-height: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.ra-name-text:hover {
+  text-decoration: underline;
+  color: #242424;
+}
+
+/* 상태 뱃지 wrapper — inline-flex로 텍스트 길이 기반 가변 너비 */
+.ra-status-wrap {
+  display: inline-flex;
+}
+
+
+/* ===== 모달 폼 ===== */
+.ra-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ra-form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #242424;
+  line-height: 22px;
+}
+
+/* ===== 페이지 하단 ===== */
+.ra-page-bottom {
+  padding: 32px 32px 16px 32px;
+  border-top: 1px solid #E0E0E0;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}

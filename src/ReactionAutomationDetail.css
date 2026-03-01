@@ -1,0 +1,134 @@
+/* ===== 체크박스 (디자인 시스템 reset 오버라이드) ===== */
+.ra-table input[type="checkbox"] {
+  appearance: auto;
+  -webkit-appearance: checkbox;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ===== 뒤로가기 버튼 ===== */
+.ra-back-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.ra-back-btn:hover {
+  background: #F0F0F0;
+}
+
+/* ===== 탭 ===== */
+.ra-detail-tabs {
+  display: flex;
+  padding: 0 32px;
+  border-bottom: 1px solid #E0E0E0;
+  background: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.ra-detail-tab {
+  padding: 10px 16px;
+  cursor: pointer;
+  color: #707070;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+}
+
+.ra-detail-tab--active {
+  color: #242424;
+  font-weight: 500;
+  border-bottom: 2px solid #5E51FF;
+}
+
+/* ===== 액션 바 ===== */
+.ra-detail-action-bar {
+  height: 56px;
+  padding: 12px 32px;
+  border-bottom: 1px solid #E0E0E0;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+/* ===== 링크 텍스트 ===== */
+.ra-link-text {
+  font-size: 12px;
+  color: #5E51FF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ===== 성과 테이블 ===== */
+.ra-perf-row {
+  cursor: pointer;
+}
+.ra-perf-row:hover td {
+  background: #FAFAFA;
+}
+
+.ra-perf-sub-row td {
+  padding: 0 !important;
+  background: #FAFAFA;
+}
+
+.ra-sub-table-wrap {
+  padding: 12px 24px;
+}
+
+.ra-sub-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ra-sub-table thead tr {
+  background: #F0F0F0;
+}
+
+.ra-sub-table th {
+  height: 32px;
+  padding: 0 10px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+  color: #707070;
+  line-height: 16px;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.ra-sub-table td {
+  height: 36px;
+  padding: 0 10px;
+  font-size: 12px;
+  color: #424242;
+  border-bottom: 1px solid #F0F0F0;
+  vertical-align: middle;
+}
+.ra-sub-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===== 가이드 모달 이미지 영역 ===== */
+.ra-guide-image {
+  width: 100%;
+  height: 200px;
+  background: #F5F5F5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
