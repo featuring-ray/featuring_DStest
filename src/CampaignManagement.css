@@ -1,0 +1,341 @@
+.cm-page {
+  min-height: 100vh;
+  background: var(--semantic-color-background-1);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%; /* 테이블 min-width가 상위 컨테이너를 늘리는 것 방지 */
+}
+
+/* ===== 상단 바 ===== */
+/* Figma: height 51px, padding 0 32px, bottom border #E0E0E0 */
+.cm-topbar {
+  height: 51px;
+  padding: 0 32px;
+  border-bottom: 1px solid #E0E0E0;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+.cm-topbar-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #31363A;
+  line-height: 24px;
+}
+
+
+/* ===== 통계 바 ===== */
+/* Figma: total height 136px, padding T24 R32 B24 L32 */
+.cm-stats-bar {
+  padding: 24px 32px;
+  border-bottom: 1px solid #E0E0E0;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.cm-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 24px;
+}
+.cm-stat-item:first-child {
+  padding-left: 0;
+}
+.cm-stat-item:last-child {
+  padding-right: 0;
+}
+
+.cm-stat-divider {
+  width: 1px;
+  height: 44px;
+  background: #F0F0F0;
+  flex-shrink: 0;
+}
+
+.cm-stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #959595;
+  line-height: 18px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+
+.cm-stat-value {
+  font-size: 28px;
+  font-weight: 500;
+  color: #242424;
+  line-height: 36px;
+}
+
+.cm-stat-suffix {
+  font-size: 14px;
+  font-weight: 400;
+  color: #959595;
+  line-height: 22px;
+  margin-left: 2px;
+}
+
+
+/* ===== 테이블 래퍼 ===== */
+.cm-table-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* flex item이 min-content 이하로 줄어들 수 있도록 */
+  width: 100%;
+}
+
+/* ===== 로컬 헤더 ===== */
+.cm-local-header {
+  background: #FFFFFF;
+  border-bottom: 1px solid #E0E0E0;
+  flex-shrink: 0;
+}
+
+/* 탭 */
+.cm-tabs {
+  padding: 0 32px;
+  border-bottom: 1px solid #E0E0E0;
+  display: flex;
+}
+
+.cm-tab {
+  padding: 10px 16px;
+  cursor: pointer;
+  color: #707070;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+}
+
+.cm-tab--active {
+  color: #242424;
+  font-weight: 500;
+  border-bottom: 2px solid #5E51FF;
+}
+
+/* 필터 행: Figma height 56px, padding T12 R32 B12 L32 */
+.cm-filter-row {
+  height: 56px;
+  padding: 12px 32px;
+  border-bottom: 1px solid #E0E0E0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+/* ===== 테이블 ===== */
+.cm-table-container {
+  overflow-x: auto;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.cm-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1858px; /* 실제 컬럼 합계: 22+400+100+200+160+100+100+96+100+120+120+200+140 */
+  table-layout: fixed;
+}
+
+/* 테이블 헤더: Figma height 36px, bg #FAFAFA */
+.cm-table thead tr {
+  background: #FAFAFA;
+}
+
+.cm-table th {
+  height: 36px;
+  padding: 0 10px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 400;
+  color: #424242;
+  line-height: 18px;
+  white-space: nowrap;
+  border-right: 1px solid #F0F0F0; /* Figma: 기본 연한 border */
+  border-bottom: 1px solid #F0F0F0;
+  vertical-align: middle;
+}
+/* 캠페인명 열만 진한 border */
+.cm-table th:nth-child(2) {
+  border-right: 1px solid #D2D2D2;
+}
+.cm-table th:last-child {
+  border-right: none;
+}
+
+/* ===== Sticky 컬럼 (col0 + 캠페인명) ===== */
+.cm-table th:first-child,
+.cm-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+.cm-table th:nth-child(2),
+.cm-table td:nth-child(2) {
+  position: sticky;
+  left: 22px;
+  z-index: 2;
+}
+/* Header sticky: 더 높은 z-index */
+.cm-table thead th:first-child,
+.cm-table thead th:nth-child(2) {
+  background: #FAFAFA;
+  z-index: 3;
+}
+/* Body sticky: 불투명 배경 */
+.cm-table td:first-child,
+.cm-table td:nth-child(2) {
+  background: #FFFFFF;
+}
+/* Hover 오버라이드 */
+.cm-tr:hover td:first-child,
+.cm-tr:hover td:nth-child(2) {
+  background: #FAFAFA;
+}
+/* 캠페인명 td 우측도 진한 border */
+.cm-table td:nth-child(2) {
+  border-right: 1px solid #D2D2D2;
+}
+
+.cm-th-check {
+  width: 22px;
+  text-align: center;
+  border-right: 1px solid #F0F0F0;
+}
+
+/* 컬럼 너비: Figma 스펙 */
+.cm-col-num    { width: 22px; }
+.cm-col-title  { width: 400px; }
+.cm-col-status { width: 100px; }
+.cm-col-tag    { width: 200px; }
+.cm-col-period { width: 160px; }
+.cm-col-type   { width: 100px; }
+.cm-col-brand  { width: 100px; }
+.cm-col-2nd    { width: 96px; }
+.cm-col-platform { width: 100px; }
+.cm-col-upload { width: 120px; }
+.cm-col-fee    { width: 120px; }
+.cm-col-cat    { width: 200px; }
+.cm-col-manager{ width: 140px; }
+
+/* 테이블 행: Figma row height 64px */
+.cm-table td {
+  height: 64px;
+  padding: 0 10px;
+  border-bottom: 1px solid #F0F0F0;
+  border-right: 1px solid #F0F0F0;
+  vertical-align: middle;
+  font-size: 12px;
+  font-weight: 400;
+  color: #424242;
+}
+.cm-table td:last-child {
+  border-right: none;
+}
+
+.cm-td-check {
+  text-align: center;
+  padding: 0 10px;
+}
+
+.cm-tr:hover td {
+  background: #FAFAFA;
+}
+
+/* 캠페인명 셀 */
+.cm-td-title {
+  padding: 8px 10px;
+}
+
+/* Title cell 내부: 가로 flex 레이아웃 */
+.cm-title-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.cm-title-text-area {
+  flex: 1;
+  min-width: 0;
+}
+.cm-title-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.cm-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  color: #424242;
+}
+
+/* 캠페인 제목 */
+.cm-title-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: #242424;
+  line-height: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cm-desc-text {
+  font-size: 12px;
+  font-weight: 400;
+  color: #707070;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* 더보기 버튼 */
+.cm-more-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #E0E0E0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.cm-more-btn:hover {
+  background: #FAFAFA;
+}
+
+/* ===== 페이지 하단 ===== */
+/* Figma: height 88px, padding T32 R32 B16 L32 */
+.cm-page-bottom {
+  padding: 32px 32px 16px 32px;
+  border-top: 1px solid #E0E0E0;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+

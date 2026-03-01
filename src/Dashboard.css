@@ -1,0 +1,89 @@
+/* 대시보드 헤더 */
+.dashboard-header {
+  padding: var(--global-spacing-800) var(--global-spacing-1000);
+  background: var(--semantic-color-background-1);
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* 대시보드 콘텐츠 */
+.dashboard-content {
+  padding: var(--global-spacing-800) var(--global-spacing-1000);
+}
+
+/* KPI 카드 그리드 */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--global-spacing-600);
+  margin-bottom: var(--global-spacing-800);
+}
+
+.kpi-card {
+  background: var(--semantic-color-background-1);
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-300);
+  padding: var(--global-spacing-600);
+  box-shadow: var(--global-elevation-2);
+}
+
+.kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--global-radius-200);
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* 테이블 카드 */
+.table-card {
+  background: var(--semantic-color-background-1);
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-300);
+  padding: var(--global-spacing-600);
+  box-shadow: var(--global-elevation-2);
+}
+
+/* 인플루언서 테이블 */
+.influencer-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.influencer-table thead tr {
+  border-bottom: 1px solid var(--semantic-color-border-default);
+}
+
+.influencer-table th {
+  text-align: left;
+  padding: var(--global-spacing-300) var(--global-spacing-400);
+  padding-bottom: var(--global-spacing-400);
+}
+
+.influencer-table td {
+  padding: var(--global-spacing-400);
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  vertical-align: middle;
+}
+
+.influencer-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.influencer-table tbody tr:hover td {
+  background: var(--semantic-color-background-2);
+}
+
+/* 아바타 */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--global-radius-full);
+  background: var(--semantic-color-background-3);
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
