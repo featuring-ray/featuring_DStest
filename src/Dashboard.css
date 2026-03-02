@@ -1,89 +1,426 @@
-/* 대시보드 헤더 */
-.dashboard-header {
-  padding: var(--global-spacing-800) var(--global-spacing-1000);
-  background: var(--semantic-color-background-1);
-  border-bottom: 1px solid var(--semantic-color-border-default);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+.dashboard-wrapper {
+  padding: 32px;
+  background: #fafafa;
+  min-height: 100%;
 }
 
-/* 대시보드 콘텐츠 */
-.dashboard-content {
-  padding: var(--global-spacing-800) var(--global-spacing-1000);
+/* ==================== AI 리스트업 대시보드 전체 박스 ==================== */
+.ai-listup-dashboard {
+  background: #f5f7ff;
+  border: 1px solid #ecefffff;
+  border-radius: 8px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-/* KPI 카드 그리드 */
-.kpi-grid {
+/* ==================== 타이틀 섹션 ==================== */
+.dashboard-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dashboard-label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.571;
+  color: #7273ff;
+}
+
+.dashboard-title {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.417;
+  color: #242424;
+}
+
+/* 알림 배너 (gradient border) */
+.dashboard-notify-banner {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 999px;
+  padding: 4px 12px 4px 4px;
+  width: fit-content;
+}
+
+.dashboard-notify-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  padding: 1px;
+  background: linear-gradient(-91deg, #ffffff 0%, #55ecdf 30%, #9aa3ff 60%, #9378ff 100%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.dashboard-notify-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #ecefffff;
+  border: 1.35px solid #dce2ff;
+  flex-shrink: 0;
+}
+
+.dashboard-notify-text {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.571;
+  color: #1f1551;
+}
+
+/* ==================== 리스트업 카드 영역 ==================== */
+.listup-cards-area {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--global-spacing-600);
-  margin-bottom: var(--global-spacing-800);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  background: rgba(236, 239, 255, 0.5);
+  border: 1px solid #dce2ff;
+  border-radius: 8px;
+  padding: 16px;
 }
 
-.kpi-card {
-  background: var(--semantic-color-background-1);
-  border: 1px solid var(--semantic-color-border-default);
-  border-radius: var(--global-radius-300);
-  padding: var(--global-spacing-600);
-  box-shadow: var(--global-elevation-2);
+/* 활성 리스트업 카드 */
+.listup-card {
+  background: #ffffff;
+  border: 1px solid #ecefffff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.kpi-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--global-radius-200);
+/* 빈 상태 카드 */
+.listup-card--empty {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #d2d2d2;
+  height: 214px;
+}
+
+/* 카드 상단 */
+.listup-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.listup-card-sns-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-/* 테이블 카드 */
-.table-card {
-  background: var(--semantic-color-background-1);
-  border: 1px solid var(--semantic-color-border-default);
-  border-radius: var(--global-radius-300);
-  padding: var(--global-spacing-600);
-  box-shadow: var(--global-elevation-2);
+.listup-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
 }
 
-/* 인플루언서 테이블 */
-.influencer-table {
-  width: 100%;
-  border-collapse: collapse;
+.listup-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.influencer-table thead tr {
-  border-bottom: 1px solid var(--semantic-color-border-default);
+.listup-card-title {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
-.influencer-table th {
-  text-align: left;
-  padding: var(--global-spacing-300) var(--global-spacing-400);
-  padding-bottom: var(--global-spacing-400);
+.listup-card-requester {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.455;
+  color: #707070;
 }
 
-.influencer-table td {
-  padding: var(--global-spacing-400);
-  border-bottom: 1px solid var(--semantic-color-border-default);
-  vertical-align: middle;
+/* 상태 뱃지 */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  height: 20px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.influencer-table tbody tr:last-child td {
-  border-bottom: none;
+.status-badge--primary {
+  background: #ecefffff;
+  border: 1px solid #dce2ff;
 }
 
-.influencer-table tbody tr:hover td {
-  background: var(--semantic-color-background-2);
+.status-badge--primary .status-badge-dot {
+  background: #7273ff;
 }
 
-/* 아바타 */
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--global-radius-full);
-  background: var(--semantic-color-background-3);
+.status-badge--primary .status-badge-text {
+  color: #1f1551;
+}
+
+.status-badge--orange {
+  background: #fcf2e6;
+  border: 1px solid #f5d5b0;
+}
+
+.status-badge--orange .status-badge-dot {
+  background: #e07b00;
+}
+
+.status-badge--orange .status-badge-text {
+  color: #7a3e00;
+}
+
+.status-badge--gray {
+  background: #f6f6f6;
+  border: 1px solid #e0e0e0;
+}
+
+.status-badge--gray .status-badge-dot {
+  background: #d2d2d2;
+}
+
+.status-badge--gray .status-badge-text {
+  color: #707070;
+}
+
+.status-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-badge-text {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* 카드 통계 */
+.listup-card-stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.listup-card-stats-label {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #707070;
+}
+
+.listup-card-stats-row {
+  display: flex;
+  align-items: stretch;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.listup-card-stat-item {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.listup-card-stat-value {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.417;
+  color: #424242;
+}
+
+.listup-card-stat-value--new {
+  color: #3ba974;
+}
+
+.listup-card-stat-sublabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #707070;
+}
+
+.listup-card-stat-divider {
+  display: flex;
+  align-items: stretch;
+  padding: 0 10px;
+}
+
+.listup-card-stat-divider-line {
+  width: 1px;
+  background: #f0f0f0;
+}
+
+/* 카드 하단 */
+.listup-card-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.listup-card-divider {
+  height: 1px;
+  background: #f0f0f0;
+}
+
+.listup-card-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ==================== 빈 상태 카드 ==================== */
+.listup-card-empty-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.listup-card-empty-body {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  gap: 10px;
+  flex: 1;
+}
+
+.listup-card-empty-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.listup-card-empty-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.listup-card-empty-title {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.571;
+  color: #000000;
+  text-align: center;
+}
+
+.listup-card-empty-desc {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.455;
+  color: #707070;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.listup-card-empty-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* ==================== 누적 현황 섹션 ==================== */
+.dashboard-stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dashboard-stats-title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #242424;
+}
+
+.stat-boxes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stat-box {
+  background: #ffffff;
+  border: 1px solid #ecefffff;
+  border-radius: 4px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-box-label-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-box-label-text {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #707070;
+}
+
+.stat-box-value-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-box-value {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #242424;
+}
+
+.stat-box-sub {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #3ba974;
 }
