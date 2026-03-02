@@ -18,7 +18,6 @@
   justify-content: space-between;
   position: sticky;
   top: 0;
-  z-index: 20;
   flex-shrink: 0;
 }
 
@@ -102,13 +101,13 @@
 .ra-sticky-first td:first-child {
   position: sticky;
   left: 0;
-  z-index: 2;
+  z-index: 0;
   border-right: 1px solid #D2D2D2;
 }
 
 .ra-sticky-first thead th:first-child {
   background: #FAFAFA;
-  z-index: 3;
+  z-index: 0;
 }
 
 .ra-sticky-first td:first-child {
@@ -121,7 +120,7 @@
 
 /* 테이블 행 */
 .ra-table td {
-  height: 64px;
+  height: 56px;
   padding: 0 10px;
   border-bottom: 1px solid #F0F0F0;
   border-right: 1px solid #F0F0F0;
@@ -168,6 +167,19 @@
   display: inline-flex;
 }
 
+
+/* ===== 달력 dropdown — 모달 위에 표시 ===== */
+#dropdown-container {
+  position: relative;
+  z-index: 9999;
+}
+
+/* ===== 날짜 트리거 — readOnly 배경색 override ===== */
+.ra-date-trigger-input[aria-readonly=true],
+.ra-date-trigger-input[aria-readOnly=true] {
+  background-color: var(--semantic-color-background-1) !important;
+  cursor: pointer;
+}
 
 /* ===== 모달 폼 ===== */
 .ra-form-field {

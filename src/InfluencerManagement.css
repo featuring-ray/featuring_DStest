@@ -1,0 +1,387 @@
+.im-page {
+  min-height: 100vh;
+  background: var(--semantic-color-background-1);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ===== 상단 바 ===== */
+.im-topbar {
+  height: 50px;
+  padding: 0 32px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+.im-topbar-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #31363a;
+  line-height: 1.5;
+}
+
+/* ===== 로컬 헤더 ===== */
+.im-local-header {
+  height: 54px;
+  padding: 0 32px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: sticky;
+  top: 50px;
+  z-index: 19;
+}
+
+.im-lh-group-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #707070;
+  line-height: 1.5;
+}
+
+.im-lh-divider {
+  width: 1px;
+  height: 14px;
+  background: #e0e0e0;
+}
+
+.im-lh-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #31363a;
+  line-height: 1.571;
+}
+
+/* 플랫폼 필터 버튼 그룹 */
+.im-platform-filter {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.im-pf-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 2px;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+}
+
+.im-pf-btn--active {
+  opacity: 1;
+  background: #f0f0f0;
+}
+
+.im-pf-btn:hover {
+  opacity: 0.8;
+}
+
+.im-lh-count {
+  font-size: 14px;
+  font-weight: 400;
+  color: #31363a;
+  line-height: 1.571;
+}
+
+.im-lh-count-sub {
+  font-size: 12px;
+  font-weight: 400;
+  color: #959595;
+  line-height: 1.5;
+}
+
+/* ===== 테이블 래퍼 ===== */
+.im-table-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+/* ===== 필터 행 ===== */
+.im-filter-row {
+  height: 48px;
+  padding: 0 32px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+/* ===== 테이블 ===== */
+.im-table-container {
+  overflow-x: auto;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.im-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 2340px;
+  table-layout: fixed;
+}
+
+/* 컬럼 너비 */
+.im-col-check    { width: 40px; }
+.im-col-account  { width: 240px; }
+.im-col-email    { width: 180px; }
+.im-col-notes    { width: 100px; }
+.im-col-price    { width: 120px; }
+.im-col-progress { width: 100px; }
+.im-col-link     { width: 200px; }
+.im-col-doc      { width: 80px; }
+.im-col-file     { width: 80px; }
+.im-col-cat      { width: 150px; }
+.im-col-follower { width: 120px; }
+.im-col-er       { width: 80px; }
+.im-col-reach    { width: 130px; }
+.im-col-feed     { width: 130px; }
+.im-col-vview    { width: 130px; }
+.im-col-vlike    { width: 130px; }
+.im-col-cpr      { width: 100px; }
+.im-col-adfee    { width: 110px; }
+.im-col-lang     { width: 90px; }
+
+/* 헤더 행 */
+.im-table thead tr {
+  background: #fafafa;
+}
+
+.im-table th {
+  height: 38px;
+  padding: 0 12px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 400;
+  color: #424242;
+  line-height: 1.5;
+  white-space: nowrap;
+  border-right: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+  background: #fafafa;
+}
+
+.im-th-check {
+  text-align: center;
+}
+
+.im-table th:nth-child(2) {
+  border-right: 1px solid #d2d2d2;
+}
+
+.im-table th:last-child {
+  border-right: none;
+}
+
+/* Sticky 컬럼 */
+.im-table th:first-child,
+.im-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+.im-table th:nth-child(2),
+.im-table td:nth-child(2) {
+  position: sticky;
+  left: 40px;
+  z-index: 2;
+}
+
+.im-table thead th:first-child,
+.im-table thead th:nth-child(2) {
+  z-index: 3;
+}
+
+.im-table td:first-child,
+.im-table td:nth-child(2) {
+  background: #ffffff;
+}
+
+.im-tr:hover td:first-child,
+.im-tr:hover td:nth-child(2) {
+  background: #fafafa;
+}
+
+.im-table td:nth-child(2) {
+  border-right: 1px solid #d2d2d2;
+}
+
+/* 데이터 행 */
+.im-table td {
+  height: 56px;
+  padding: 0 12px;
+  border-bottom: 1px solid #f0f0f0;
+  border-right: 1px solid #f0f0f0;
+  vertical-align: middle;
+  font-size: 12px;
+  font-weight: 400;
+  color: #424242;
+}
+
+.im-table td:last-child {
+  border-right: none;
+}
+
+.im-tr:hover td {
+  background: #fafafa;
+}
+
+/* 체크박스 */
+.im-td-check {
+  text-align: center;
+}
+
+.im-checkbox {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: #5e51ff;
+}
+
+/* 계정 셀 */
+.im-td-account {
+  padding: 8px 12px;
+}
+
+.im-account-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.im-account-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #242424;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.im-account-sub {
+  font-size: 11px;
+  font-weight: 400;
+  color: #707070;
+  line-height: 1.5;
+}
+
+/* 가운데 정렬 */
+.im-td-center {
+  text-align: center;
+}
+
+/* 셀 텍스트 스타일 */
+.im-cell-text {
+  font-size: 12px;
+  color: #424242;
+}
+
+.im-cell-empty {
+  font-size: 12px;
+  color: #bbbbbb;
+}
+
+.im-cell-number {
+  font-size: 12px;
+  color: #424242;
+}
+
+.im-cell-link {
+  font-size: 11px;
+  color: #5e51ff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
+}
+
+/* 진행 여부 뱃지 */
+.im-progress-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 400;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.im-progress-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* 카테고리 태그 */
+.im-cat-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 400;
+  color: #00695c;
+  background: #e0f2f1;
+  border: 1px solid #80cbc4;
+  white-space: nowrap;
+}
+
+/* 정렬 가능 헤더 */
+.im-th-sort {
+  cursor: pointer;
+  user-select: none;
+}
+
+.im-th-sort:hover {
+  background: #f0f0f0;
+}
+
+.im-th-sort-inner {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ===== 페이지 하단 ===== */
+.im-page-bottom {
+  padding: 20px 32px 16px 32px;
+  border-top: 1px solid #e0e0e0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}

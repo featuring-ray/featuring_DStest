@@ -1,16 +1,28 @@
 import './ReactionAutomation.css'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { Routes, Route, Link } from 'react-router-dom'
-import { Flex, VStack, Typo, CoreButton, CoreSelect, CoreTextInput, CoreModal, CoreStatusBadge, CorePagination, CoreTabs, CoreTabItem, CoreTag, IconButton } from '@featuring-corp/components'
+import { Flex, VStack, Typo, CoreButton, CoreSelect, CoreTextInput, CoreModal, CoreStatusBadge, CorePagination, CoreTabs, CoreTabItem, CoreTag, IconButton, CoreCalendar, CoreDropdown } from '@featuring-corp/components'
 import {
   IconSearchOutline,
   IconAddOutline,
   IconMoreHorizontalFilled,
-  IconGroupListOutline,
+  IconUserOutline,
   IconDocumentOutline,
   IconCaretDownFilled,
+  IconCalendarOutline,
+  IconChevronDownOutline,
 } from '@featuring-corp/icons'
 import ReactionAutomationDetail from './ReactionAutomationDetail'
+
+/* ── 날짜 포맷 ── */
+function formatDate(date: Date | null): string {
+  if (!date) return ''
+  const yy = String(date.getFullYear()).slice(2)
+  const mm = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  return `${yy}. ${mm}. ${dd}`
+}
 
 /* ── 상태별 스타일 ── */
 type StatusKey = '진행 전' | '진행 중' | '종료'
@@ -139,18 +151,50 @@ function ReactionAutomationList() {
 
   /* ── 생성 폼 상태 ── */
   const [formName, setFormName] = useState('')
+  const [, setFormCampaign] = useState('')
+  const [formDateRange, setFormDateRange] = useState<[Date | null, Date | null]>([null, null])
+  const [pendingDateRange, setPendingDateRange] = useState<[Date | null, Date | null]>([null, null])
+  const [calendarOpen, setCalendarOpen] = useState(false)
+  const datePickerRef = useRef<HTMLDivElement>(null)
+  const [formProduct, setFormProduct] = useState('')
+  const [formBrand, setFormBrand] = useState('')
 
   const isFormValid = formName.trim().length >= 1 && formName.length <= 20
+
+  const openCalendar = () => {
+    setPendingDateRange(formDateRange)
+    setCalendarOpen(true)
+  }
+
+  const confirmDateRange = () => {
+    setFormDateRange(pendingDateRange)
+    setCalendarOpen(false)
+  }
+
+  const cancelDateRange = () => {
+    setPendingDateRange(formDateRange)
+    setCalendarOpen(false)
+  }
+
+  const resetForm = () => {
+    setFormName('')
+    setFormCampaign('')
+    setFormDateRange([null, null])
+    setPendingDateRange([null, null])
+    setCalendarOpen(false)
+    setFormProduct('')
+    setFormBrand('')
+  }
 
   const handleCreate = () => {
     if (!isFormValid) return
     setShowCreateModal(false)
-    setFormName('')
+    resetForm()
   }
 
   const handleCloseModal = () => {
     setShowCreateModal(false)
-    setFormName('')
+    resetForm()
   }
 
   /* ── 탭 카운트 & 필터 ── */
@@ -266,9 +310,9 @@ function ReactionAutomationList() {
                           tagType="gray"
                           size="sm"
                           text={String(a.influencerCount)}
-                          leadingElement={<IconGroupListOutline size={12} />}
+                          leadingElement={<IconUserOutline size={12} />}
                         />
-                        <IconButton variant="tertiary" size="sm">
+                        <IconButton variant="contrast" size="sm">
                           <IconMoreHorizontalFilled size={16} />
                         </IconButton>
                       </Flex>
@@ -344,7 +388,7 @@ function ReactionAutomationList() {
       </div>
 
       {/* ── 자동화 생성 모달 ── */}
-      {showCreateModal && (
+      {showCreateModal && createPortal(
         <CoreModal
           size="md"
           title="새 자동화 관리"
@@ -370,14 +414,69 @@ function ReactionAutomationList() {
             />
             <div className="ra-form-field">
               <label className="ra-form-label">연결 캠페인</label>
-              <CoreSelect size="md" placeholderText="캠페인을 선택하세요">
+              <CoreSelect size="md" placeholderText="캠페인을 선택하세요" setValue={setFormCampaign}>
                 {CAMPAIGN_OPTIONS.map(opt => (
                   <CoreSelect.Item key={opt.value} value={opt.value}>{opt.label}</CoreSelect.Item>
                 ))}
               </CoreSelect>
             </div>
+            <div className="ra-form-field">
+              <label className="ra-form-label">캠페인 기간</label>
+              <div ref={datePickerRef}>
+                <CoreTextInput
+                  size="md"
+                  placeholder="YYYY. MM. DD – YYYY. MM. DD"
+                  readOnly
+                  value={
+                    formDateRange[0] && formDateRange[1]
+                      ? `${formatDate(formDateRange[0])} – ${formatDate(formDateRange[1])}`
+                      : ''
+                  }
+                  leadingElement={<IconCalendarOutline size={14} color="var(--semantic-color-icon-tertiary)" />}
+                  trailingElement={<IconChevronDownOutline size={16} color="var(--semantic-color-icon-tertiary)" />}
+                  inputDivClassName="ra-date-trigger-input"
+                  onClick={openCalendar}
+                  style={{ cursor: 'pointer' }}
+                />
+              </div>
+              <CoreDropdown
+                open={calendarOpen}
+                handler={cancelDateRange}
+                targetRef={datePickerRef}
+                targetMargin="4px"
+                placement="bottom-start"
+                style={{ zIndex: 9999 }}
+              >
+                <CoreCalendar
+                  selectsRange
+                  monthsShown={2}
+                  startDate={pendingDateRange[0] ?? undefined}
+                  endDate={pendingDateRange[1] ?? undefined}
+                  onChange={(dates) => setPendingDateRange(dates)}
+                  actionsChildren={[
+                    <CoreButton key="cancel" buttonType="contrast" size="sm" text="취소" onClick={cancelDateRange} />,
+                    <CoreButton key="confirm" buttonType="primary" size="sm" text="확인" onClick={confirmDateRange} />,
+                  ]}
+                />
+              </CoreDropdown>
+            </div>
+            <CoreTextInput
+              label="상품명"
+              placeholder="상품명을 입력하세요"
+              size="md"
+              value={formProduct}
+              onChange={(e) => setFormProduct(e.target.value)}
+            />
+            <CoreTextInput
+              label="브랜드명"
+              placeholder="브랜드명을 입력하세요"
+              size="md"
+              value={formBrand}
+              onChange={(e) => setFormBrand(e.target.value)}
+            />
           </VStack>
-        </CoreModal>
+        </CoreModal>,
+        document.body
       )}
     </div>
   )
