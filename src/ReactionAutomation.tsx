@@ -2,7 +2,7 @@ import './ReactionAutomation.css'
 import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Routes, Route, Link } from 'react-router-dom'
-import { Flex, VStack, Typo, CoreButton, CoreSelect, CoreTextInput, CoreModal, CoreStatusBadge, CorePagination, CoreTabs, CoreTabItem, CoreTag, IconButton, CoreCalendar, CoreDropdown } from '@featuring-corp/components'
+import { Flex, VStack, Typo, CoreButton, CoreSelect, CoreTextInput, CoreModal, CoreStatusBadge, CorePagination, CoreTabs, CoreTabItem, CoreTag, CoreCalendar, CoreDropdown } from '@featuring-corp/components'
 import {
   IconSearchOutline,
   IconAddOutline,
@@ -312,9 +312,7 @@ function ReactionAutomationList() {
                           text={String(a.influencerCount)}
                           leadingElement={<IconUserOutline size={12} />}
                         />
-                        <IconButton variant="contrast" size="sm">
-                          <IconMoreHorizontalFilled size={16} />
-                        </IconButton>
+                        <CoreButton buttonType="contrast" size="sm" prefix={<IconMoreHorizontalFilled size={16} />} />
                       </Flex>
                     </td>
 

@@ -5,7 +5,6 @@ import { Flex, VStack, HStack, Box, CoreButton, CoreModal, CoreTextInput, CoreSt
 import {
   IconChevronLeftOutline,
   IconAddOutline,
-  IconSearchOutline,
   IconLinkOutline,
   IconTrashOutline,
   IconDownloadOutline,
@@ -90,7 +89,6 @@ const MOCK_PERFORMANCE: PerformanceRow[] = [
   },
 ]
 
-const GUIDE_LINK_BASE = 'https://studio.featuring.co/guide/'
 
 /* ── 탭 타입 ── */
 type TabKey = 'influencers' | 'performance'
