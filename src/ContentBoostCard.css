@@ -1,0 +1,63 @@
+/* ── ContentBoostCard ── */
+
+.cbc-card {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 16px;
+  background: var(--semantic-color-background-1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cbc-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* 썸네일 */
+.cbc-thumbnail {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-2);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.cbc-recommended-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+}
+
+/* 성과 지표 그리드 */
+.cbc-stats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cbc-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px;
+  background: var(--semantic-color-background-2);
+  border-radius: var(--global-radius-100);
+}
+
+/* 성과 비교 뱃지 */
+.cbc-performance-badge {
+  padding: 6px 10px;
+  background: var(--global-colors-teal-10);
+  border-radius: var(--global-radius-100);
+  display: inline-flex;
+  align-self: flex-start;
+}
+
+/* 액션 영역 */
+.cbc-actions {
+  border-top: 1px solid var(--semantic-color-border-default);
+  padding-top: 12px;
+}

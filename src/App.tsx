@@ -5,6 +5,19 @@ import CampaignManagement from './CampaignManagement'
 import Dashboard from './Dashboard'
 import ReactionAutomation from './ReactionAutomation'
 import InfluencerManagement from './InfluencerManagement'
+import AdManagement from './AdManagement'
+import AiPlayground from './AiPlayground'
+import ContentExplorer from './ContentExplorer'
+import ProposalBuilder from './ProposalBuilder'
+import OutreachDM from './OutreachDM'
+import FeedbackConverter from './FeedbackConverter'
+import RemindScheduler from './RemindScheduler'
+import ContentReviewer from './ContentReviewer'
+import ReportGenerator from './ReportGenerator'
+import CreativeBrief from './CreativeBrief'
+import DocumentVerification from './DocumentVerification'
+import DeliveryTracker from './DeliveryTracker'
+import ScheduleCalculator from './ScheduleCalculator'
 import { Box, Flex, VStack, Typo, Center, CoreTag } from '@featuring-corp/components'
 import {
   IconDashboardOutline,
@@ -23,6 +36,8 @@ import {
   IconMailOutline,
   IconContentsOutline,
   IconLightningOutline,
+  IconMoneyOutline,
+  IconAiLavelOutline,
 } from '@featuring-corp/icons'
 
 type NavItem = {
@@ -61,6 +76,13 @@ const NAV_SECTIONS: { label: string | null; items: NavItem[] }[] = [
       { icon: IconLightningOutline, label: '반응 자동화 관리', tag: 'NEW', path: '/reaction-automation' },
       { icon: IconContentsOutline, label: '종료 예정', path: '/campaign/ending', disabled: true },
       { icon: IconMailOutline, label: 'DM/이메일 발송', path: '/campaign/dm', disabled: true },
+      { icon: IconMoneyOutline, label: '광고 관리', tag: 'NEW', path: '/ad-management' },
+    ],
+  },
+  {
+    label: 'AI실험실',
+    items: [
+      { icon: IconAiLavelOutline, label: 'AI 실험실', tag: 'NEW', path: '/ai-playground' },
     ],
   },
 ]
@@ -191,6 +213,19 @@ export default function App() {
           <Route path="/campaign" element={<CampaignManagement />} />
           <Route path="/reaction-automation/*" element={<ReactionAutomation />} />
           <Route path="/influencer/manage" element={<InfluencerManagement />} />
+          <Route path="/ad-management" element={<AdManagement />} />
+          <Route path="/ai-playground" element={<AiPlayground />} />
+          <Route path="/content-explorer" element={<ContentExplorer />} />
+          <Route path="/proposal-builder" element={<ProposalBuilder />} />
+          <Route path="/outreach-dm" element={<OutreachDM />} />
+          <Route path="/feedback-converter" element={<FeedbackConverter />} />
+          <Route path="/remind-scheduler" element={<RemindScheduler />} />
+          <Route path="/content-reviewer" element={<ContentReviewer />} />
+          <Route path="/report-generator" element={<ReportGenerator />} />
+          <Route path="/creative-brief" element={<CreativeBrief />} />
+          <Route path="/document-verification" element={<DocumentVerification />} />
+          <Route path="/delivery-tracker" element={<DeliveryTracker />} />
+          <Route path="/schedule-calculator" element={<ScheduleCalculator />} />
           <Route path="*" element={<Dashboard />} />
         </Routes>
       </Box>

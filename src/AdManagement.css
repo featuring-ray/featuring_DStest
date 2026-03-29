@@ -1,0 +1,114 @@
+.am-page {
+  min-height: 100vh;
+  background: var(--semantic-color-background-1);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ===== 상단 바 ===== */
+.am-topbar {
+  height: 51px;
+  padding: 0 32px;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  background: var(--semantic-color-background-1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+/* ===== 본문 ===== */
+.am-content {
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===== 섹션 ===== */
+.am-section {
+  background: var(--semantic-color-background-2);
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 20px;
+}
+
+.am-section--list {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.am-section-header {
+  margin-bottom: 12px;
+}
+
+/* ===== 광고 계정 카드 ===== */
+.am-account-card {
+  padding: 12px 16px;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-1);
+}
+
+/* ===== 통계 그리드 ===== */
+.am-stats-grid {
+  display: flex;
+  gap: 16px;
+}
+
+.am-stat-card {
+  flex: 1;
+  padding: 16px;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-1);
+}
+
+/* ===== 광고 목록 ===== */
+.am-ad-list {
+  margin-top: 12px;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  overflow: hidden;
+}
+
+.am-ad-item {
+  padding: 16px 20px;
+  background: var(--semantic-color-background-1);
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.am-ad-item:last-child {
+  border-bottom: none;
+}
+
+.am-ad-item:hover {
+  background: var(--semantic-color-background-2);
+}
+
+.am-ad-thumbnail {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-2);
+  border: 1px solid var(--semantic-color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ===== 빈 상태 ===== */
+.am-empty {
+  padding: 40px;
+  text-align: center;
+  background: var(--semantic-color-background-1);
+}

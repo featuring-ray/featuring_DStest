@@ -1,0 +1,200 @@
+.cb-page {
+  min-height: 100vh;
+  background: var(--semantic-color-background-1);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ===== 상단 바 ===== */
+.cb-topbar {
+  height: 51px;
+  padding: 0 32px;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  background: var(--semantic-color-background-1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+/* ===== 본문 2단 레이아웃 ===== */
+.cb-content {
+  padding: 24px 32px;
+  display: flex;
+  gap: 24px;
+  flex: 1;
+}
+
+.cb-left {
+  width: 360px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cb-right {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===== 입력 패널 ===== */
+.cb-input-panel {
+  background: var(--semantic-color-background-2);
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 20px;
+}
+
+.cb-field {
+  margin-bottom: 14px;
+}
+
+.cb-field:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== 인플루언서 리스트 ===== */
+.cb-influencer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cb-influencer-item {
+  padding: 10px 14px;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-1);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.cb-influencer-item:hover {
+  border-color: var(--global-colors-primary-60);
+}
+
+.cb-influencer-item--selected {
+  border-color: var(--global-colors-primary-60);
+  background: var(--global-colors-teal-10);
+}
+
+/* ===== 결과 패널 ===== */
+.cb-result-panel {
+  background: var(--semantic-color-background-2);
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 20px;
+}
+
+.cb-empty-result {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+/* ===== 콘셉트 카드 ===== */
+.cb-concept-card {
+  padding: 16px;
+  border-radius: var(--global-radius-100);
+  background: var(--global-colors-teal-10);
+  border-left: 3px solid var(--global-colors-teal-70);
+  margin-bottom: 16px;
+}
+
+/* ===== 훅 시나리오 카드 ===== */
+.cb-hooks {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.cb-hook-card {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-1);
+}
+
+/* ===== 콘티 타임라인 ===== */
+.cb-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.cb-timeline::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--semantic-color-border-default);
+}
+
+.cb-timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  position: relative;
+}
+
+.cb-timeline-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--global-radius-full);
+  background: var(--global-colors-primary-60);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.cb-timeline-content {
+  flex: 1;
+  padding-top: 2px;
+}
+
+/* ===== Do & Don't ===== */
+.cb-dodont {
+  display: flex;
+  gap: 16px;
+}
+
+.cb-do-list,
+.cb-dont-list {
+  flex: 1;
+  padding: 14px;
+  border-radius: var(--global-radius-100);
+}
+
+.cb-do-list {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.cb-dont-list {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.cb-dodont-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.cb-dodont-item:last-child {
+  margin-bottom: 0;
+}

@@ -1,0 +1,185 @@
+/* ── OutreachDM 페이지 ── */
+.odm-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--semantic-color-background-1);
+}
+
+.odm-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 51px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  background: var(--semantic-color-background-1);
+}
+
+.odm-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 좌측 입력 영역 */
+.odm-left {
+  width: 380px;
+  flex-shrink: 0;
+  padding: 20px 24px;
+  overflow-y: auto;
+  border-right: 1px solid var(--semantic-color-border-default);
+}
+
+/* 우측 결과 영역 */
+.odm-right {
+  flex: 1;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+/* 섹션 */
+.odm-section {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 16px;
+  background: var(--semantic-color-background-1);
+}
+
+/* 폼 필드 래퍼 */
+.odm-form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 인플루언서 카드 */
+.odm-inf-card {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 12px;
+  background: var(--semantic-color-background-2);
+}
+
+.odm-inf-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--global-radius-full);
+  background: var(--global-colors-primary-60);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* AI 진행 패널 */
+.odm-ai-panel {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 16px;
+  margin-bottom: 16px;
+  background: var(--semantic-color-background-2);
+}
+
+.odm-ai-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--global-radius-full);
+  background: var(--global-colors-primary-60);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.odm-ai-dot--pulse {
+  animation: odm-pulse 1.2s infinite;
+}
+
+@keyframes odm-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.odm-ai-typing {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.odm-typing-dots::after {
+  content: '...';
+  animation: odm-dots 1.4s steps(4, end) infinite;
+}
+
+@keyframes odm-dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
+/* 빈 상태 */
+.odm-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  opacity: 0.6;
+}
+
+/* 매칭 포인트 카드 */
+.odm-match-card {
+  border: 1px solid var(--global-colors-teal-10);
+  border-radius: var(--global-radius-100);
+  padding: 14px 16px;
+  background: var(--global-colors-teal-10);
+}
+
+/* DM 박스 */
+.odm-dm-box {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 16px;
+  background: var(--semantic-color-background-2);
+}
+
+.odm-dm-preview {
+  padding: 12px;
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-1);
+  border: 1px solid var(--semantic-color-border-default);
+}
+
+.odm-dm-textarea {
+  width: 100%;
+  min-height: 260px;
+  padding: 12px;
+  border-radius: var(--global-radius-100);
+  border: 1px solid var(--global-colors-primary-60);
+  background: var(--semantic-color-background-1);
+  color: var(--semantic-color-text-1);
+  font-family: var(--global-typography-font-sans);
+  font-size: 13px;
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+}
+
+/* 복사 토스트 */
+.odm-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--semantic-color-text-1);
+  padding: 8px 20px;
+  border-radius: var(--global-radius-full);
+  z-index: 100;
+  animation: odm-fade-in 0.3s ease;
+}
+
+@keyframes odm-fade-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}

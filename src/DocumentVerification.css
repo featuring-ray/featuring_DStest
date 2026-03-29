@@ -1,0 +1,260 @@
+/* ── DocumentVerification ── */
+
+.dv-page {
+  min-height: 100vh;
+  background: var(--semantic-color-background-1);
+}
+
+/* 상단바 */
+.dv-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 51px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  background: var(--semantic-color-background-1);
+}
+
+/* 컨트롤 */
+.dv-controls {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+}
+
+/* 파이프라인 */
+.dv-pipeline-wrap {
+  padding: 24px;
+}
+
+.dv-pipeline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+}
+
+.dv-pipeline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.dv-pipeline-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--global-radius-full);
+  border: 2px solid var(--semantic-color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--semantic-color-background-1);
+  transition: all 0.3s;
+}
+
+.dv-pipeline-circle--done {
+  background: var(--global-colors-teal-70);
+  border-color: var(--global-colors-teal-70);
+}
+
+.dv-pipeline-circle--active {
+  background: var(--global-colors-primary-60);
+  border-color: var(--global-colors-primary-60);
+  animation: dv-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes dv-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+}
+
+.dv-pipeline-line {
+  position: absolute;
+  top: 15px;
+  left: calc(50% + 20px);
+  width: calc(100% - 40px);
+  height: 2px;
+  background: var(--semantic-color-border-default);
+  transition: background 0.3s;
+}
+
+.dv-pipeline-line--done {
+  background: var(--global-colors-teal-70);
+}
+
+/* AI 패널 */
+.dv-ai-panel {
+  margin: 0 24px 24px;
+  padding: 16px;
+  background: var(--semantic-color-background-2);
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+}
+
+.dv-ai-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--global-radius-full);
+  background: var(--global-colors-teal-70);
+  flex-shrink: 0;
+}
+
+.dv-ai-dot--pulse {
+  animation: dv-dot-pulse 1s ease-in-out infinite;
+}
+
+@keyframes dv-dot-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.dv-ai-typing {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dv-typing-dots::after {
+  content: '...';
+  animation: dv-dots 1.4s steps(4, end) infinite;
+}
+
+@keyframes dv-dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
+/* 테이블 */
+.dv-table-wrap {
+  padding: 0 24px 24px;
+}
+
+.dv-table-container {
+  overflow-x: auto;
+}
+
+.dv-table {
+  width: 100%;
+  min-width: 800px;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.dv-table th,
+.dv-table td {
+  padding: 12px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  font-family: var(--global-typography-font-sans);
+  font-size: 13px;
+  color: var(--semantic-color-text-1);
+}
+
+.dv-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--semantic-color-text-3);
+  background: var(--semantic-color-background-2);
+}
+
+.dv-table tbody tr:hover {
+  background: var(--semantic-color-background-2);
+}
+
+/* 요약 */
+.dv-summary {
+  margin: 0 24px 24px;
+  padding: 20px;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-1);
+}
+
+.dv-summary-card {
+  flex: 1;
+  padding: 16px;
+  border-radius: var(--global-radius-100);
+  text-align: center;
+  border: 1px solid var(--semantic-color-border-default);
+}
+
+.dv-summary-card--pass {
+  background: rgba(20, 184, 166, 0.05);
+}
+
+.dv-summary-card--error {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.dv-summary-card--missing {
+  background: rgba(245, 158, 11, 0.05);
+}
+
+/* 진행률 바 */
+.dv-progress {
+  margin-top: 8px;
+}
+
+.dv-progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--semantic-color-border-default);
+  border-radius: var(--global-radius-full);
+  overflow: hidden;
+}
+
+.dv-progress-fill {
+  height: 100%;
+  background: var(--global-colors-teal-70);
+  border-radius: var(--global-radius-full);
+  transition: width 0.6s ease;
+}
+
+/* 상세 패널 오버레이 */
+.dv-detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dv-detail-panel {
+  width: 520px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--semantic-color-background-1);
+  border-radius: var(--global-radius-100);
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.dv-detail-section {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+}
+
+.dv-detail-section:last-child {
+  border-bottom: none;
+}
+
+.dv-detail-error-box {
+  padding: 12px;
+  background: var(--semantic-color-background-2);
+  border-radius: var(--global-radius-100);
+}
+
+.dv-dm-preview {
+  padding: 16px;
+  background: var(--semantic-color-background-2);
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+}

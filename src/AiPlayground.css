@@ -1,0 +1,42 @@
+.ai-playground {
+  padding: 32px;
+  gap: 24px;
+}
+
+.ai-playground__header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--semantic-color-border-1);
+}
+
+.ai-playground__grid {
+  margin-top: 8px;
+}
+
+.ai-playground__card {
+  width: 320px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--semantic-color-border-1);
+  background: var(--semantic-color-surface-1);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ai-playground__card:hover {
+  border-color: var(--global-colors-primary-60);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ai-playground__card--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  cursor: default;
+  min-height: 88px;
+}
+
+.ai-playground__card--empty:hover {
+  border-color: var(--semantic-color-border-1);
+  box-shadow: none;
+}

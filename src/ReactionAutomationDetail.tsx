@@ -89,7 +89,6 @@ const MOCK_PERFORMANCE: PerformanceRow[] = [
   },
 ]
 
-
 /* ── 탭 타입 ── */
 type TabKey = 'influencers' | 'performance'
 

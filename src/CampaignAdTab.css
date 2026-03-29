@@ -1,0 +1,78 @@
+.cat-page {
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===== 섹션 ===== */
+.cat-section {
+  background: var(--semantic-color-background-2);
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 20px;
+}
+
+/* ===== 콘텐츠 추천 카드 ===== */
+.cat-content-card {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+}
+
+.cat-content-card:first-child {
+  padding-top: 0;
+}
+
+.cat-content-card:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cat-thumbnail {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-1);
+  border: 1px solid var(--semantic-color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ===== 진행 중 광고 ===== */
+.cat-active-ad {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+}
+
+.cat-active-ad:first-child {
+  padding-top: 0;
+}
+
+.cat-active-ad:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* ===== 비교 바 차트 ===== */
+.cat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cat-bar-track {
+  flex: 1;
+  height: 20px;
+  background: var(--semantic-color-background-1);
+  border-radius: var(--global-radius-100);
+  overflow: hidden;
+}
+
+.cat-bar-fill {
+  height: 100%;
+  border-radius: var(--global-radius-100);
+  transition: width 0.3s ease;
+  min-width: 2px;
+}

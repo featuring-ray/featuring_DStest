@@ -1,0 +1,134 @@
+/* ── DeliveryTracker ── */
+
+.dt-page {
+  min-height: 100vh;
+  background: var(--semantic-color-background-1);
+}
+
+/* 상단바 */
+.dt-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 51px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  background: var(--semantic-color-background-1);
+}
+
+/* 요약 카드 */
+.dt-summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 24px;
+}
+
+.dt-summary-card {
+  padding: 20px;
+  border-radius: var(--global-radius-100);
+  border: 1px solid var(--semantic-color-border-default);
+  text-align: center;
+}
+
+.dt-card--green { background: rgba(20, 184, 166, 0.05); }
+.dt-card--yellow { background: rgba(245, 158, 11, 0.05); }
+.dt-card--blue { background: rgba(99, 102, 241, 0.05); }
+.dt-card--red { background: rgba(239, 68, 68, 0.05); }
+
+/* 테이블 */
+.dt-table-wrap {
+  padding: 0 24px 24px;
+}
+
+.dt-table-container {
+  overflow-x: auto;
+}
+
+.dt-table {
+  width: 100%;
+  min-width: 900px;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.dt-table th,
+.dt-table td {
+  padding: 12px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  font-family: var(--global-typography-font-sans);
+  font-size: 13px;
+  color: var(--semantic-color-text-1);
+}
+
+.dt-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--semantic-color-text-3);
+  background: var(--semantic-color-background-2);
+}
+
+.dt-table tbody tr:hover {
+  background: var(--semantic-color-background-2);
+}
+
+/* 이상 알림 */
+.dt-alert-panel {
+  margin: 0 24px 24px;
+  padding: 20px;
+  border: 1px solid #fecaca;
+  border-radius: var(--global-radius-100);
+  background: rgba(239, 68, 68, 0.03);
+}
+
+.dt-alert-item {
+  padding: 12px;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-1);
+}
+
+/* 리포트 */
+.dt-report-section {
+  padding: 0 24px 24px;
+}
+
+.dt-report-preview {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 20px;
+  background: var(--semantic-color-background-1);
+}
+
+.dt-report-slack-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+}
+
+.dt-slack-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #e01e5a, #36c5f0, #2eb67d, #ecb22e);
+  flex-shrink: 0;
+}
+
+.dt-report-content {
+  font-family: var(--global-typography-font-sans);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--semantic-color-text-1);
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+  padding: 16px;
+  background: var(--semantic-color-background-2);
+  border-radius: var(--global-radius-100);
+}

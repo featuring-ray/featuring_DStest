@@ -1,0 +1,264 @@
+/* ── RemindScheduler 페이지 ── */
+.rs-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--semantic-color-background-1);
+}
+
+.rs-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 51px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  background: var(--semantic-color-background-1);
+}
+
+/* 캠페인 선택 바 */
+.rs-campaign-bar {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+}
+
+/* AI 진행 패널 */
+.rs-ai-bar {
+  padding: 16px 24px;
+}
+
+.rs-ai-panel {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 16px;
+  background: var(--semantic-color-background-2);
+}
+
+.rs-ai-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--global-radius-full);
+  background: var(--global-colors-primary-60);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.rs-ai-dot--pulse {
+  animation: rs-pulse 1.2s infinite;
+}
+
+@keyframes rs-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.rs-ai-typing {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rs-typing-dots::after {
+  content: '...';
+  animation: rs-dots 1.4s steps(4, end) infinite;
+}
+
+@keyframes rs-dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
+/* 빈 상태 */
+.rs-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  opacity: 0.6;
+}
+
+/* 콘텐츠 영역 */
+.rs-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.rs-main-area {
+  flex: 1;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+/* 상태 요약 칩 */
+.rs-summary-bar {
+  flex-wrap: wrap;
+}
+
+.rs-summary-chip {
+  padding: 6px 14px;
+  border-radius: var(--global-radius-full);
+}
+
+.rs-chip-success {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.rs-chip-error {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.rs-chip-primary {
+  background: #eff6ff;
+  color: var(--global-colors-primary-60);
+}
+
+/* ── 타임라인 ── */
+.rs-timeline {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 20px;
+  margin-bottom: 20px;
+  background: var(--semantic-color-background-2);
+}
+
+.rs-timeline-track {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 20px;
+}
+
+.rs-timeline-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.rs-timeline-node {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--global-radius-full);
+  z-index: 2;
+}
+
+.rs-timeline-connector {
+  position: absolute;
+  top: 8px;
+  left: calc(50% + 8px);
+  right: calc(-50% + 8px);
+  height: 2px;
+  background: var(--semantic-color-border-default);
+  z-index: 1;
+}
+
+.rs-remind-markers {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  margin-top: 4px;
+}
+
+.rs-remind-marker {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  background: #fef3c7;
+  padding: 1px 6px;
+  border-radius: var(--global-radius-full);
+  border: 1px solid #fbbf24;
+}
+
+/* ── 테이블 ── */
+.rs-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.rs-table {
+  width: 100%;
+  min-width: 900px;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.rs-table th,
+.rs-table td {
+  padding: 12px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  font-size: 13px;
+}
+
+.rs-table th {
+  font-weight: 600;
+  color: var(--semantic-color-text-3);
+  font-size: 12px;
+  background: var(--semantic-color-background-2);
+}
+
+.rs-tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rs-tr:hover {
+  background: var(--semantic-color-background-2);
+}
+
+.rs-tr--selected {
+  background: var(--global-colors-teal-10);
+}
+
+/* ── 하단 요약 ── */
+.rs-bottom-summary {
+  border: 1px solid var(--global-colors-teal-10);
+  border-radius: var(--global-radius-100);
+  padding: 12px 16px;
+  background: var(--global-colors-teal-10);
+}
+
+/* ── 상세 패널 ── */
+.rs-detail-panel {
+  width: 360px;
+  flex-shrink: 0;
+  padding: 20px;
+  border-left: 1px solid var(--semantic-color-border-default);
+  overflow-y: auto;
+  background: var(--semantic-color-background-1);
+}
+
+.rs-detail-card {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 14px;
+  background: var(--semantic-color-background-2);
+}
+
+.rs-detail-optimal {
+  background: var(--global-colors-teal-10);
+  border-color: var(--global-colors-teal-10);
+}
+
+.rs-detail-dm {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 14px;
+}
+
+.rs-dm-preview {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: var(--global-radius-100);
+  border: 1px solid var(--semantic-color-border-default);
+  background: var(--semantic-color-background-2);
+}

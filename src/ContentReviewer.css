@@ -1,0 +1,164 @@
+.cr-page {
+  min-height: 100vh;
+  background: var(--semantic-color-background-1);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ===== 상단 바 ===== */
+.cr-topbar {
+  height: 51px;
+  padding: 0 32px;
+  border-bottom: 1px solid var(--semantic-color-border-default);
+  background: var(--semantic-color-background-1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+/* ===== 본문 ===== */
+.cr-content {
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 960px;
+}
+
+/* ===== 입력 섹션 ===== */
+.cr-input-section {
+  background: var(--semantic-color-background-2);
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 20px;
+}
+
+.cr-input-section label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.cr-field {
+  margin-bottom: 16px;
+}
+
+.cr-field:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== AI 분석 진행 ===== */
+.cr-analyzing {
+  text-align: center;
+  padding: 32px 0;
+}
+
+.cr-analyzing-dots::after {
+  content: '';
+  animation: cr-dots 1.4s steps(4, end) infinite;
+}
+
+@keyframes cr-dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
+/* ===== 결과 섹션 ===== */
+.cr-result-section {
+  background: var(--semantic-color-background-2);
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  padding: 20px;
+}
+
+/* ===== 체크 카드 ===== */
+.cr-check-card {
+  border-radius: var(--global-radius-100);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+}
+
+.cr-check-card:last-child {
+  margin-bottom: 0;
+}
+
+.cr-check-card--pass {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.cr-check-card--fail {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.cr-check-card--warn {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.cr-check-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--global-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.cr-check-icon--pass {
+  background: #10b981;
+  color: white;
+}
+
+.cr-check-icon--fail {
+  background: #ef4444;
+  color: white;
+}
+
+.cr-check-icon--warn {
+  background: #f59e0b;
+  color: white;
+}
+
+.cr-suggestion {
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: var(--global-radius-100);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* ===== 요약 바 ===== */
+.cr-summary-bar {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-1);
+  border: 1px solid var(--semantic-color-border-default);
+}
+
+.cr-summary-item {
+  flex: 1;
+  text-align: center;
+  padding: 8px;
+}
+
+/* ===== DM 프리뷰 ===== */
+.cr-dm-preview {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-1);
+  border: 1px solid var(--semantic-color-border-default);
+  white-space: pre-line;
+}

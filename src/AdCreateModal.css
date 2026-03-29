@@ -1,0 +1,118 @@
+/* ── AdCreateModal ── */
+
+.acm-step-indicator {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.acm-step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--global-radius-full);
+  background: var(--semantic-color-border-default);
+  transition: background 0.2s;
+}
+
+.acm-step-dot--active {
+  background: var(--global-colors-primary-60);
+  width: 24px;
+  border-radius: 4px;
+}
+
+.acm-step-dot--done {
+  background: var(--global-colors-primary-60);
+}
+
+/* 콘텐츠 프리뷰 */
+.acm-content-preview {
+  padding: 12px;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-2);
+}
+
+.acm-thumbnail-placeholder {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-border-default);
+  flex-shrink: 0;
+}
+
+/* 라디오 아이템 */
+.acm-radio-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.acm-radio-item:hover {
+  background: var(--semantic-color-background-2);
+}
+
+.acm-radio-item--selected {
+  border-color: var(--global-colors-primary-60);
+  background: var(--global-colors-teal-10);
+}
+
+.acm-radio-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--global-radius-full);
+  border: 2px solid var(--semantic-color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.acm-radio-item--selected .acm-radio-circle {
+  border-color: var(--global-colors-primary-60);
+}
+
+.acm-radio-circle-inner {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--global-radius-full);
+  background: var(--global-colors-primary-60);
+}
+
+/* 커스텀 타겟 */
+.acm-custom-target {
+  padding: 16px;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-2);
+  margin-top: 4px;
+}
+
+/* AI 추천 팁 */
+.acm-ai-tip {
+  padding: 12px 16px;
+  border-radius: var(--global-radius-100);
+  background: var(--global-colors-teal-10);
+}
+
+/* 요약 박스 */
+.acm-summary-box {
+  padding: 16px;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--global-radius-100);
+  background: var(--semantic-color-background-2);
+}
+
+/* Partnership 안내 */
+.acm-partnership-notice {
+  padding: 16px;
+  border-radius: var(--global-radius-100);
+  background: #FFF8E1;
+  border: 1px solid #FFE082;
+}
