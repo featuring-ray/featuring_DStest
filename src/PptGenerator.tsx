@@ -1,5 +1,9 @@
 import './PptGenerator.css'
-import { useState, useCallback, useRef, useReducer } from 'react'
+import { useState, useCallback, useRef, useReducer, useEffect } from 'react'
+import { generateSlides, editSlide } from './api/slideGenerator'
+import { exportToPptx, exportToPdf } from './utils/slideExporter'
+import { parseFile, filesToPromptText, type ParsedFileData } from './utils/fileParser'
+import { searchInfluencers, influencersToPromptText, type InfluencerData } from './data/influencers'
 import { Flex, VStack, Typo, CoreButton, CoreTag } from '@featuring-corp/components'
 import {
   IconAiLavelOutline,
@@ -16,69 +20,21 @@ import {
   IconWidgetOutline,
   IconMagicWandOutline,
   IconCheckCircleFilled,
-  IconSubtractOutline,
-  IconZoomInAreaOutline,
   IconDraggableFilled,
   IconReportDataOutline,
   IconInsightOutline,
 } from '@featuring-corp/icons'
+import type { Slide, PptTheme, PptState, PptAction, PptStatus } from './types/slides'
+import PptCanvas from './ppt/PptCanvas'
+import PptInspector from './ppt/PptInspector'
+import PptExportModal from './ppt/PptExportModal'
+import PptThemeModal from './ppt/PptThemeModal'
+import PptSidebarPanels from './ppt/PptSidebarPanels'
+import { usePptPersistence, type PresentationRecord } from './ppt/usePptPersistence'
 
-/* ═══════════════════════ 타입 ═══════════════════════ */
+/* ═══════════════════════ 상수 ═══════════════════════ */
 
-type PptStatus = 'INIT' | 'LOADING' | 'ANALYZING' | 'GENERATING' | 'OUTLINE' | 'EDITING' | 'COMPLETE' | 'ERROR'
-type SlideType = 'title' | 'kpi' | 'chart' | 'comparison' | 'insight' | 'recommendation'
-
-interface SlideElement {
-  id: string
-  kind: 'text' | 'kpi-grid' | 'bar-chart' | 'list'
-  content: string
-  data?: Record<string, unknown>[]
-}
-
-interface Slide {
-  id: string
-  type: SlideType
-  title: string
-  summary: string
-  elements: SlideElement[]
-}
-
-interface PptTheme {
-  id: string
-  name: string
-  primary: string
-  secondary: string
-  accent: string
-  bg: string
-}
-
-interface PptState {
-  status: PptStatus
-  slides: Slide[]
-  activeSlideIndex: number
-  selectedElementId: string | null
-  theme: PptTheme
-  error: string | null
-  sidebarTab: string
-}
-
-type PptAction =
-  | { type: 'SET_STATUS'; status: PptStatus }
-  | { type: 'SET_SLIDES'; slides: Slide[] }
-  | { type: 'SET_ACTIVE_SLIDE'; index: number }
-  | { type: 'SELECT_ELEMENT'; id: string | null }
-  | { type: 'SET_THEME'; theme: PptTheme }
-  | { type: 'SET_SIDEBAR'; tab: string }
-  | { type: 'UPDATE_ELEMENT'; slideIndex: number; elementId: string; content: string }
-  | { type: 'UPDATE_SLIDE_TITLE'; slideIndex: number; title: string }
-  | { type: 'ADD_SLIDE' }
-  | { type: 'DELETE_SLIDE'; index: number }
-  | { type: 'SET_ERROR'; error: string }
-  | { type: 'RESET' }
-
-/* ═══════════════════════ 상수 / Mock ═══════════════════════ */
-
-const THEMES: PptTheme[] = [
+export const THEMES: PptTheme[] = [
   { id: 'default', name: '프로페셔널', primary: '#4f46e5', secondary: '#374151', accent: '#0d9488', bg: '#ffffff' },
   { id: 'dark', name: '다크 모드', primary: '#60a5fa', secondary: '#e5e7eb', accent: '#34d399', bg: '#1f2937' },
   { id: 'warm', name: '웜 톤', primary: '#f59e0b', secondary: '#78350f', accent: '#ef4444', bg: '#fffbeb' },
@@ -94,83 +50,6 @@ const CAMPAIGNS = [
 ]
 
 const QUICK_PROMPTS = ['캠페인 성과 리포트', '인플루언서 분석', '제안서 초안', '월간 트렌드 리포트']
-
-function generateMockSlides(): Slide[] {
-  return [
-    {
-      id: 's1', type: 'title', title: '캠페인 성과 분석 리포트',
-      summary: '그린러브 비건스킨케어 캠페인의 목표, 기간, 핵심 전략을 요약하는 도입부입니다.',
-      elements: [
-        { id: 'e1', kind: 'text', content: '그린러브 비건스킨케어 캠페인' },
-        { id: 'e2', kind: 'text', content: '2026.02.15 – 2026.03.15 | 크리에이터 6명 | 예산 2,500만원' },
-        { id: 'e3', kind: 'text', content: 'AI가 자동 생성한 성과 분석 프레젠테이션입니다.' },
-      ],
-    },
-    {
-      id: 's2', type: 'kpi', title: '핵심 성과 요약',
-      summary: '도달, 참여, CPE, 전환율, ROI 등 주요 KPI를 한눈에 보여주는 요약 슬라이드입니다.',
-      elements: [{
-        id: 'e4', kind: 'kpi-grid', content: '',
-        data: [
-          { label: '총 도달', value: '1,247,000', sub: '+23% vs 목표' },
-          { label: '총 참여', value: '85,200', sub: '참여율 6.8%' },
-          { label: '평균 CPE', value: '214원', sub: '벤치마크 대비 우수' },
-          { label: '전환율', value: '3.2%', sub: '업계 평균 2.1%' },
-          { label: 'ROI', value: '287%', sub: '목표 200% 초과' },
-          { label: '브랜드 언급', value: '1,840건', sub: '+45% vs 이전' },
-        ],
-      }],
-    },
-    {
-      id: 's3', type: 'chart', title: '채널별 성과 비교',
-      summary: 'Instagram, YouTube, TikTok 채널 간 도달·참여·CPE를 비교 분석합니다.',
-      elements: [{
-        id: 'e5', kind: 'bar-chart', content: '',
-        data: [
-          { label: 'Instagram 릴스', value: 434000, pct: 73, color: '#4f46e5' },
-          { label: 'YouTube 쇼츠', value: 312000, pct: 53, color: '#0d9488' },
-          { label: 'TikTok', value: 278000, pct: 47, color: '#ec4899' },
-          { label: 'Instagram 피드', value: 223000, pct: 38, color: '#f59e0b' },
-        ],
-      }],
-    },
-    {
-      id: 's4', type: 'comparison', title: 'Top 3 퍼포머',
-      summary: 'CPE 효율 기준 상위 3인의 채널, 포맷, 도달, CPE를 상세 비교합니다.',
-      elements: [
-        { id: 'e6', kind: 'text', content: '1위: @creator_C — YouTube 쇼츠 | 도달 312,000 | CPE 113원' },
-        { id: 'e7', kind: 'text', content: '2위: @creator_E — TikTok 쇼츠 | 도달 278,000 | CPE 128원' },
-        { id: 'e8', kind: 'text', content: '3위: @creator_A — Instagram 릴스 | 도달 245,000 | CPE 137원' },
-      ],
-    },
-    {
-      id: 's5', type: 'insight', title: '핵심 인사이트',
-      summary: 'AI가 분석한 주요 성과 패턴, 콘텐츠 구조 효과, 게시 시간 최적화 인사이트입니다.',
-      elements: [{
-        id: 'e9', kind: 'list', content: '',
-        data: [
-          { text: '숏폼(릴스+쇼츠)이 전체 참여의 87%를 차지하며, 피드 대비 CPE가 2.8배 효율적입니다.' },
-          { text: '"제품 시연 + 비포/애프터" 구조에서 가장 높은 참여율을 기록했습니다.' },
-          { text: '오후 8-10시 게시물의 참여율이 오전 대비 1.6배 높았습니다.' },
-        ],
-      }],
-    },
-    {
-      id: 's6', type: 'recommendation', title: '향후 전략 제언',
-      summary: '재협업 추천, 채널 확장 전략, 예산 재배분 등 데이터 기반 전략 제안입니다.',
-      elements: [{
-        id: 'e10', kind: 'list', content: '',
-        data: [
-          { text: '재협업 1순위: @creator_C (CPE 최저, 도달 최고) — 장기 앰배서더 계약 검토' },
-          { text: '신규 채널 확장: TikTok 비중을 30%→50%로 확대 (CPE 효율 우수)' },
-          { text: '예산 배분: 숏폼 70% / 피드 20% / 스토리 10% 비율로 재배분' },
-        ],
-      }],
-    },
-  ]
-}
-
-function formatNum(n: number): string { return n.toLocaleString('ko-KR') }
 
 /* ═══════════════════════ Reducer ═══════════════════════ */
 
@@ -206,8 +85,22 @@ function pptReducer(state: PptState, action: PptAction): PptState {
       sl.elements = sl.elements.map(e => e.id === action.elementId ? { ...e, content: action.content } : e)
       s[action.slideIndex] = sl; return { ...state, slides: s }
     }
+    case 'UPDATE_ELEMENT_DATA': {
+      const s = [...state.slides]; const sl = { ...s[action.slideIndex] }
+      sl.elements = sl.elements.map(e => {
+        if (e.id !== action.elementId || !e.data) return e
+        const newData = [...(e.data as Record<string, unknown>[])]
+        newData[action.dataIndex] = { ...newData[action.dataIndex], [action.field]: action.value }
+        return { ...e, data: newData }
+      })
+      s[action.slideIndex] = sl; return { ...state, slides: s }
+    }
     case 'UPDATE_SLIDE_TITLE': {
       const s = [...state.slides]; s[action.slideIndex] = { ...s[action.slideIndex], title: action.title }
+      return { ...state, slides: s }
+    }
+    case 'UPDATE_SLIDE_SUMMARY': {
+      const s = [...state.slides]; s[action.slideIndex] = { ...s[action.slideIndex], summary: action.summary }
       return { ...state, slides: s }
     }
     case 'ADD_SLIDE': {
@@ -220,6 +113,25 @@ function pptReducer(state: PptState, action: PptAction): PptState {
       const ns = state.slides.filter((_, i) => i !== action.index)
       return { ...state, slides: ns, activeSlideIndex: Math.min(state.activeSlideIndex, ns.length - 1), selectedElementId: null }
     }
+    case 'REORDER_SLIDES': {
+      const { fromIndex, toIndex } = action
+      if (fromIndex === toIndex) return state
+      const ns = [...state.slides]
+      const [moved] = ns.splice(fromIndex, 1)
+      ns.splice(toIndex, 0, moved)
+      let newActive = state.activeSlideIndex
+      if (state.activeSlideIndex === fromIndex) newActive = toIndex
+      else if (fromIndex < state.activeSlideIndex && toIndex >= state.activeSlideIndex) newActive--
+      else if (fromIndex > state.activeSlideIndex && toIndex <= state.activeSlideIndex) newActive++
+      return { ...state, slides: ns, activeSlideIndex: newActive }
+    }
+    case 'UPDATE_ELEMENT_STYLE': {
+      const s = [...state.slides]; const sl = { ...s[action.slideIndex] }
+      sl.elements = sl.elements.map(e =>
+        e.id === action.elementId ? { ...e, style: { ...e.style, ...action.style } } : e
+      )
+      s[action.slideIndex] = sl; return { ...state, slides: s }
+    }
     case 'SET_ERROR': return { ...state, error: action.error, status: 'ERROR' }
     case 'RESET': return initialState
     default: return state
@@ -228,15 +140,17 @@ function pptReducer(state: PptState, action: PptAction): PptState {
 
 /* ═══════════════════════ 공통 서브 컴포넌트 ═══════════════════════ */
 
-function GNB({ title, onGenerate, showGenerate = true }: { title: string; onGenerate?: () => void; showGenerate?: boolean }) {
+function GNB({ title, onReset, onSettings, showGenerate = true, onGenerate }: {
+  title: string; onReset?: () => void; onSettings?: () => void; showGenerate?: boolean; onGenerate?: () => void
+}) {
   return (
     <div className="ppt-gnb">
       <div className="ppt-gnb__left">
         <Typo variant="$heading-5" style={{ color: 'var(--global-colors-primary-60)', fontWeight: 700 }}>{title}</Typo>
       </div>
       <div className="ppt-gnb__right">
-        <button className="ppt-gnb__icon-btn"><IconRecentOutline size={20} /></button>
-        <button className="ppt-gnb__icon-btn"><IconSettingsOutline size={20} /></button>
+        <button className="ppt-gnb__icon-btn" onClick={onReset} title="홈으로"><IconRecentOutline size={20} /></button>
+        <button className="ppt-gnb__icon-btn" onClick={onSettings} title="설정"><IconSettingsOutline size={20} /></button>
         {showGenerate && onGenerate && (
           <CoreButton buttonType="primary" size="sm" text="Generate Presentation" onClick={onGenerate} />
         )}
@@ -275,41 +189,305 @@ export default function PptGenerator() {
   const [showTheme, setShowTheme] = useState(false)
   const [showExport, setShowExport] = useState(false)
   const [magicInput, setMagicInput] = useState('')
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [magicLoading, setMagicLoading] = useState(false)
+  const [editingField, setEditingField] = useState<string | null>(null)
+  const [attachedFiles, setAttachedFiles] = useState<ParsedFileData[]>([])
+  const [parseError, setParseError] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [urlInput, setUrlInput] = useState('')
+  const [urlLoading, setUrlLoading] = useState(false)
+  const [fetchedUrls, setFetchedUrls] = useState<{ url: string; title: string; text: string }[]>([])
+  const [urlError, setUrlError] = useState<string | null>(null)
+  const [infQuery, setInfQuery] = useState('')
+  const [infResults, setInfResults] = useState<InfluencerData[]>([])
+  const [selectedInfluencers, setSelectedInfluencers] = useState<InfluencerData[]>([])
+  const [showInfDropdown, setShowInfDropdown] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [shareCopied, setShareCopied] = useState(false)
+  const [outlineMagicIdx, setOutlineMagicIdx] = useState<number | null>(null)
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null)
+  const [showAllHistory, setShowAllHistory] = useState(false)
+  const abortRef = useRef<AbortController | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const originalSlidesRef = useRef<Slide[] | null>(null)
 
   const activeSlide = state.slides[state.activeSlideIndex] || null
+  const { history, save, remove } = usePptPersistence()
 
-  const handleGenerate = useCallback(() => {
+  // 편집 진입 시 원본 저장
+  useEffect(() => {
+    if (state.status === 'EDITING' && !originalSlidesRef.current) {
+      originalSlidesRef.current = [...state.slides]
+    }
+    if (state.status === 'INIT') {
+      originalSlidesRef.current = null
+    }
+  }, [state.status, state.slides])
+
+  // 컴포넌트 언마운트 시 진행 중인 요청 취소
+  useEffect(() => {
+    return () => { abortRef.current?.abort() }
+  }, [])
+
+  /* ═══════ 파일 / URL / 인플루언서 핸들러 ═══════ */
+
+  const handleFileSelect = useCallback(async (files: FileList | null) => {
+    if (!files) return
+    setParseError(null)
+    for (const file of Array.from(files)) {
+      try {
+        const parsed = await parseFile(file)
+        setAttachedFiles(prev => [...prev, parsed])
+      } catch (err) {
+        setParseError(err instanceof Error ? err.message : '파일 파싱 오류')
+      }
+    }
+  }, [])
+
+  const removeFile = useCallback((index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index))
+  }, [])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    handleFileSelect(e.dataTransfer.files)
+  }, [handleFileSelect])
+
+  const handleFetchUrl = useCallback(async () => {
+    if (!urlInput.trim() || urlLoading) return
+    setUrlError(null)
+    setUrlLoading(true)
+    try {
+      const res = await fetch('/api/fetch-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: urlInput.trim() }),
+      })
+      const data = await res.json() as { title?: string; text?: string; error?: string }
+      if (!res.ok || data.error) {
+        setUrlError(data.error || 'URL을 가져올 수 없습니다.')
+      } else if (data.text) {
+        setFetchedUrls(prev => [...prev, { url: urlInput.trim(), title: data.title || urlInput.trim(), text: data.text! }])
+        setUrlInput('')
+      }
+    } catch {
+      setUrlError('네트워크 오류가 발생했습니다.')
+    } finally {
+      setUrlLoading(false)
+    }
+  }, [urlInput, urlLoading])
+
+  const removeUrl = useCallback((index: number) => {
+    setFetchedUrls(prev => prev.filter((_, i) => i !== index))
+  }, [])
+
+  const handleInfSearch = useCallback((q: string) => {
+    setInfQuery(q)
+    if (q.trim().length > 0) {
+      setInfResults(searchInfluencers(q))
+      setShowInfDropdown(true)
+    } else {
+      setInfResults([])
+      setShowInfDropdown(false)
+    }
+  }, [])
+
+  const selectInfluencer = useCallback((inf: InfluencerData) => {
+    setSelectedInfluencers(prev => prev.some(s => s.id === inf.id) ? prev : [...prev, inf])
+    setInfQuery('')
+    setInfResults([])
+    setShowInfDropdown(false)
+  }, [])
+
+  const removeInfluencer = useCallback((id: number) => {
+    setSelectedInfluencers(prev => prev.filter(s => s.id !== id))
+  }, [])
+
+  /* ═══════ 생성 / 편집 / 내보내기 핸들러 ═══════ */
+
+  const handleGenerate = useCallback(async () => {
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+
     dispatch({ type: 'SET_STATUS', status: 'LOADING' })
-    timerRef.current = setTimeout(() => {
+
+    const fileData = attachedFiles.length > 0 ? filesToPromptText(attachedFiles) : ''
+    const urlData = fetchedUrls.length > 0
+      ? fetchedUrls.map(u => `=== 웹 페이지: ${u.title} (${u.url}) ===\n${u.text}`).join('\n\n')
+      : ''
+    const infData = selectedInfluencers.length > 0 ? influencersToPromptText(selectedInfluencers) : ''
+    const attachedData = (fileData || urlData || infData) ? [fileData, urlData, infData].filter(Boolean).join('\n\n') : undefined
+
+    await generateSlides(
+      { prompt, campaignId: targetId, attachedData },
+      (event) => {
+        switch (event.phase) {
+          case 'analyzing': dispatch({ type: 'SET_STATUS', status: 'ANALYZING' }); break
+          case 'generating': dispatch({ type: 'SET_STATUS', status: 'GENERATING' }); break
+          case 'complete':
+            dispatch({ type: 'SET_SLIDES', slides: event.slides })
+            dispatch({ type: 'SET_STATUS', status: 'OUTLINE' })
+            break
+          case 'error': dispatch({ type: 'SET_ERROR', error: event.message }); break
+        }
+      },
+      controller.signal,
+    )
+  }, [prompt, targetId, attachedFiles, fetchedUrls, selectedInfluencers])
+
+  const handleMagicEdit = useCallback(async (directPrompt?: string) => {
+    const prompt_ = directPrompt || magicInput.trim()
+    if (!prompt_ || !activeSlide || magicLoading) return
+    setMagicLoading(true)
+    try {
+      const updated = await editSlide(activeSlide, prompt_)
+      if (updated) {
+        const newSlides = [...state.slides]
+        newSlides[state.activeSlideIndex] = updated
+        dispatch({ type: 'SET_SLIDES', slides: newSlides })
+      }
+    } catch {
+      dispatch({ type: 'SET_ERROR', error: 'Magic Edit 처리 중 오류가 발생했습니다.' })
+    } finally {
+      setMagicLoading(false)
+      setMagicInput('')
+    }
+  }, [magicInput, state.activeSlideIndex, activeSlide, magicLoading, state.slides])
+
+  const handleOutlineMagic = useCallback(async (slideIndex: number) => {
+    const slide = state.slides[slideIndex]
+    if (!slide || outlineMagicIdx !== null) return
+    setOutlineMagicIdx(slideIndex)
+    try {
+      const updated = await editSlide(slide, '이 슬라이드를 더 임팩트 있게 개선해줘. 데이터와 인사이트를 강화해.')
+      if (updated) {
+        const newSlides = [...state.slides]
+        newSlides[slideIndex] = updated
+        dispatch({ type: 'SET_SLIDES', slides: newSlides })
+      }
+    } catch {
+      dispatch({ type: 'SET_ERROR', error: '슬라이드 개선 중 오류가 발생했습니다.' })
+    } finally {
+      setOutlineMagicIdx(null)
+    }
+  }, [state.slides, outlineMagicIdx])
+
+  const handleApplySuggestion = useCallback(async () => {
+    if (!activeSlide) return
+    const suggestionPrompt = activeSlide.type === 'chart'
+      ? '현재 성장률 기반으로 Q1 예측 데이터를 추가하고, 트렌드 인사이트를 강화해줘.'
+      : activeSlide.type === 'kpi'
+        ? 'KPI 지표에 전월 대비 변화율을 추가하고 성과 트렌드를 명확히 표현해줘.'
+        : '이 슬라이드의 핵심 메시지를 더 간결하고 임팩트 있게 정리해줘.'
+    setMagicLoading(true)
+    try {
+      const updated = await editSlide(activeSlide, suggestionPrompt)
+      if (updated) {
+        const newSlides = [...state.slides]
+        newSlides[state.activeSlideIndex] = updated
+        dispatch({ type: 'SET_SLIDES', slides: newSlides })
+      }
+    } catch {
+      dispatch({ type: 'SET_ERROR', error: 'AI 제안 적용 중 오류가 발생했습니다.' })
+    } finally {
+      setMagicLoading(false)
+    }
+  }, [activeSlide, state.slides, state.activeSlideIndex])
+
+  const handleExport = useCallback(async (format: string) => {
+    if (state.slides.length === 0 || exporting) return
+    setExporting(true)
+    try {
+      if (format === 'pptx') {
+        await exportToPptx(state.slides, state.theme)
+      } else {
+        await exportToPdf(state.slides, state.theme)
+      }
+      dispatch({ type: 'SET_STATUS', status: 'COMPLETE' })
+      save(state.slides, state.theme)
+    } catch (err) {
+      alert(`내보내기 실패: ${err instanceof Error ? err.message : '알 수 없는 오류'}`)
+    } finally {
+      setExporting(false)
+      setShowExport(false)
+    }
+  }, [state.slides, state.theme, exporting, save])
+
+  const handleShare = useCallback(() => {
+    const json = JSON.stringify({ slides: state.slides, theme: state.theme }, null, 2)
+    navigator.clipboard.writeText(json).then(() => {
+      setShareCopied(true)
+      setTimeout(() => setShareCopied(false), 2000)
+    })
+  }, [state.slides, state.theme])
+
+  const handleLoadPresentation = useCallback((record: PresentationRecord) => {
+    dispatch({ type: 'SET_SLIDES', slides: record.slides })
+    dispatch({ type: 'SET_THEME', theme: record.theme })
+    // INIT → LOADING is valid, then we jump to OUTLINE
+    dispatch({ type: 'SET_STATUS', status: 'LOADING' })
+    // Small delay to show transition, then go to OUTLINE
+    setTimeout(() => {
       dispatch({ type: 'SET_STATUS', status: 'ANALYZING' })
-      timerRef.current = setTimeout(() => {
+      setTimeout(() => {
         dispatch({ type: 'SET_STATUS', status: 'GENERATING' })
-        timerRef.current = setTimeout(() => {
-          dispatch({ type: 'SET_SLIDES', slides: generateMockSlides() })
+        setTimeout(() => {
           dispatch({ type: 'SET_STATUS', status: 'OUTLINE' })
-        }, 1200)
-      }, 1200)
-    }, 1000)
+        }, 300)
+      }, 300)
+    }, 300)
   }, [])
 
-  const handleMagicEdit = useCallback(() => {
-    if (!magicInput.trim() || !activeSlide) return
-    dispatch({ type: 'UPDATE_SLIDE_TITLE', slideIndex: state.activeSlideIndex, title: activeSlide.title + ' ✨' })
-    setMagicInput('')
-  }, [magicInput, state.activeSlideIndex, activeSlide])
+  /* ═══════ 슬라이드 드래그 재정렬 ═══════ */
 
-  const handleExport = useCallback((f: string) => {
-    dispatch({ type: 'SET_STATUS', status: 'COMPLETE' })
-    alert(`${f.toUpperCase()} 다운로드가 시작되었습니다. (Mock)`)
-    setShowExport(false)
+  const handleSlideDragStart = useCallback((e: React.DragEvent, index: number) => {
+    e.dataTransfer.setData('text/plain', String(index))
+    e.dataTransfer.effectAllowed = 'move'
   }, [])
+
+  const handleSlideDragOver = useCallback((e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setDragOverIdx(index)
+  }, [])
+
+  const handleSlideDrop = useCallback((e: React.DragEvent, toIndex: number) => {
+    e.preventDefault()
+    const fromIndex = Number(e.dataTransfer.getData('text/plain'))
+    if (!isNaN(fromIndex) && fromIndex !== toIndex) {
+      dispatch({ type: 'REORDER_SLIDES', fromIndex, toIndex })
+    }
+    setDragOverIdx(null)
+  }, [])
+
+  const handleSlideDragEnd = useCallback(() => {
+    setDragOverIdx(null)
+  }, [])
+
+  /* ═══════ GNB 공통 props ═══════ */
+  const gnbProps = {
+    onReset: () => dispatch({ type: 'RESET' }),
+    onSettings: () => setShowTheme(true),
+  }
 
   /* ═══════ INIT ═══════ */
   if (state.status === 'INIT') {
+    const displayHistory = showAllHistory ? history : history.slice(0, 3)
     return (
       <div className="ppt-page">
-        <GNB title="AI PPT Studio" onGenerate={handleGenerate} showGenerate={!!prompt.trim()} />
+        <GNB title="AI PPT Studio" {...gnbProps} onGenerate={handleGenerate} showGenerate={!!prompt.trim()} />
 
         {/* 히어로 */}
         <div className="ppt-hero">
@@ -325,8 +503,14 @@ export default function PptGenerator() {
         {/* AI 엔진 + 사이드 패널 */}
         <div className="ppt-init-content">
           {/* 좌: AI Creative Engine */}
-          <VStack style={{ gap: 16 }}>
-            <div className="ppt-engine-card">
+          <VStack style={{ gap: 16, minWidth: 0 }}>
+            <div className={`ppt-engine-card ${isDragging ? 'ppt-engine-card--dragging' : ''}`}
+              onDragOver={handleDragOver} onDragEnter={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+              {isDragging && (
+                <div className="ppt-drop-overlay">
+                  <Typo variant="$body-1" style={{ color: 'var(--global-colors-primary-60)', fontWeight: 600 }}>CSV 또는 Excel 파일을 여기에 놓으세요</Typo>
+                </div>
+              )}
               <Flex style={{ alignItems: 'center', gap: 8 }}>
                 <IconAiLavelOutline size={16} color="var(--global-colors-primary-60)" />
                 <Typo variant="$caption-1" style={{ fontWeight: 700, letterSpacing: '0.05em', color: 'var(--semantic-color-text-3)', textTransform: 'uppercase' as const }}>
@@ -341,8 +525,44 @@ export default function PptGenerator() {
                 onChange={(e) => setPrompt(e.target.value)}
               />
 
+              {attachedFiles.length > 0 && (
+                <div className="ppt-attached-files">
+                  <div className="ppt-attached-files__list">
+                    {attachedFiles.map((f, i) => (
+                      <div key={i} className="ppt-attached-file-chip">
+                        <IconDocumentOutline size={14} />
+                        <span>{f.fileName}</span>
+                        <span className="ppt-attached-file-chip__meta">{f.totalRows}행</span>
+                        <button onClick={() => removeFile(i)} title="삭제"><IconCloseOutline size={12} /></button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="ppt-data-preview">
+                    <table className="ppt-data-preview__table">
+                      <thead><tr>{attachedFiles[0].headers.map(h => <th key={h}>{h}</th>)}</tr></thead>
+                      <tbody>
+                        {attachedFiles[0].preview.map((row, ri) => (
+                          <tr key={ri}>{attachedFiles[0].headers.map(h => <td key={h}>{String(row[h] ?? '')}</td>)}</tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {attachedFiles[0].truncated && (
+                      <Typo variant="$caption-2" style={{ padding: '6px 10px', color: 'var(--semantic-color-text-4)' }}>
+                        ... {attachedFiles[0].totalRows - 200}행 추가 (프롬프트에는 200행까지 포함)
+                      </Typo>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {parseError && <div className="ppt-parse-error">{parseError}</div>}
+
               <div className="ppt-engine-card__actions">
-                <button className="ppt-gnb__icon-btn" title="파일 첨부"><IconDocumentOutline size={18} /></button>
+                <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls" multiple hidden
+                  onChange={e => { handleFileSelect(e.target.files); e.target.value = '' }} />
+                <button className="ppt-gnb__icon-btn" title="파일 첨부" onClick={() => fileInputRef.current?.click()}>
+                  <IconDocumentOutline size={18} />
+                </button>
                 <CoreButton buttonType="primary" size="md" text="프레젠테이션 생성 →" onClick={handleGenerate} />
               </div>
 
@@ -367,10 +587,30 @@ export default function PptGenerator() {
               <div className="ppt-source-card">
                 <Flex style={{ alignItems: 'center', gap: 10, marginBottom: 8 }}>
                   <IconLinkOutline size={20} color="var(--semantic-color-icon-secondary)" />
-                  <IconAddOutline size={14} color="var(--semantic-color-text-4)" style={{ marginLeft: 'auto' }} />
                 </Flex>
                 <Typo variant="$body-1" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600, marginBottom: 4 }}>웹 URL 분석</Typo>
-                <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)' }}>경쟁사 URL이나 뉴스 기사를 붙여넣어 슬라이드 덱으로 변환합니다.</Typo>
+                <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)', marginBottom: 8 }}>URL을 붙여넣어 웹 페이지 내용을 슬라이드에 반영합니다.</Typo>
+                <div className="ppt-url-input-row">
+                  <input className="ppt-url-input" placeholder="https://example.com"
+                    value={urlInput} onChange={e => setUrlInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleFetchUrl()}
+                    disabled={urlLoading} />
+                  <CoreButton buttonType="primary" size="sm"
+                    text={urlLoading ? '분석 중...' : '추가'}
+                    onClick={handleFetchUrl} disabled={urlLoading || !urlInput.trim()} />
+                </div>
+                {urlError && <div className="ppt-parse-error" style={{ marginTop: 6 }}>{urlError}</div>}
+                {fetchedUrls.length > 0 && (
+                  <div className="ppt-attached-files__list" style={{ marginTop: 8 }}>
+                    {fetchedUrls.map((u, i) => (
+                      <div key={i} className="ppt-attached-file-chip">
+                        <IconLinkOutline size={14} />
+                        <span style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.title}</span>
+                        <button onClick={() => removeUrl(i)} title="삭제"><IconCloseOutline size={12} /></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </VStack>
@@ -390,16 +630,69 @@ export default function PptGenerator() {
                   </VStack>
                   <IconCheckCircleFilled size={16} color="var(--global-colors-primary-60)" />
                 </div>
-                <div className="ppt-data-row">
-                  <div className="ppt-data-icon" style={{ background: 'var(--global-colors-teal-10)' }}>
-                    <IconInsightOutline size={18} color="var(--global-colors-teal-70)" />
+                <div className="ppt-data-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 8 }}>
+                  <Flex style={{ alignItems: 'center', gap: 10 }}>
+                    <div className="ppt-data-icon" style={{ background: 'var(--global-colors-teal-10)' }}>
+                      <IconInsightOutline size={18} color="var(--global-colors-teal-70)" />
+                    </div>
+                    <VStack style={{ gap: 2, flex: 1 }}>
+                      <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>인플루언서 프로필</Typo>
+                      <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)' }}>계정명 또는 URL로 검색</Typo>
+                    </VStack>
+                    {selectedInfluencers.length > 0 && <IconCheckCircleFilled size={16} color="var(--global-colors-teal-70)" />}
+                  </Flex>
+                  <div className="ppt-inf-search-wrap">
+                    <input className="ppt-url-input" placeholder="@계정명 또는 URL 검색..."
+                      value={infQuery} onChange={e => handleInfSearch(e.target.value)}
+                      onFocus={() => infResults.length > 0 && setShowInfDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowInfDropdown(false), 200)} />
+                    {showInfDropdown && infResults.length > 0 && (
+                      <div className="ppt-inf-dropdown">
+                        {infResults.map(inf => (
+                          <div key={inf.id} className="ppt-inf-dropdown__item" onMouseDown={() => selectInfluencer(inf)}>
+                            <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>@{inf.name}</Typo>
+                            <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)' }}>{inf.subname} · {inf.platform} · {inf.followerCount}</Typo>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <VStack style={{ gap: 2, flex: 1 }}>
-                    <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>인플루언서 프로필</Typo>
-                    <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)' }}>팔로워/참여율 데이터</Typo>
-                  </VStack>
-                  <IconCheckCircleFilled size={16} color="var(--global-colors-teal-70)" />
+                  {selectedInfluencers.length > 0 && (
+                    <div className="ppt-attached-files__list">
+                      {selectedInfluencers.map(inf => (
+                        <div key={inf.id} className="ppt-attached-file-chip">
+                          <span>@{inf.name}</span>
+                          <span className="ppt-attached-file-chip__meta">{inf.platform}</span>
+                          <button onClick={() => removeInfluencer(inf.id)} title="삭제"><IconCloseOutline size={12} /></button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
+                {attachedFiles.map((f, i) => (
+                  <div key={`af-${i}`} className="ppt-data-row">
+                    <div className="ppt-data-icon" style={{ background: 'var(--global-colors-green-10)' }}>
+                      <IconDocumentOutline size={18} color="var(--global-colors-green-70)" />
+                    </div>
+                    <VStack style={{ gap: 2, flex: 1 }}>
+                      <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>{f.fileName}</Typo>
+                      <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)' }}>{f.totalRows}행 · {f.headers.length}열</Typo>
+                    </VStack>
+                    <IconCheckCircleFilled size={16} color="var(--global-colors-green-70)" />
+                  </div>
+                ))}
+                {fetchedUrls.map((u, i) => (
+                  <div key={`url-${i}`} className="ppt-data-row">
+                    <div className="ppt-data-icon" style={{ background: 'var(--global-colors-blue-10)' }}>
+                      <IconLinkOutline size={18} color="var(--global-colors-blue-70)" />
+                    </div>
+                    <VStack style={{ gap: 2, flex: 1, minWidth: 0 }}>
+                      <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.title}</Typo>
+                      <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.url}</Typo>
+                    </VStack>
+                    <IconCheckCircleFilled size={16} color="var(--global-colors-blue-70)" />
+                  </div>
+                ))}
               </VStack>
               <VStack style={{ gap: 8, marginTop: 12 }}>
                 <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-3)', fontWeight: 600 }}>대상 캠페인</Typo>
@@ -429,24 +722,47 @@ export default function PptGenerator() {
               <Typo variant="$heading-4" style={{ color: 'var(--semantic-color-text-1)' }}>최근 프레젠테이션</Typo>
               <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)' }}>이전 작업을 이어가거나 스타일을 복제하세요.</Typo>
             </VStack>
-            <CoreButton buttonType="tertiary" size="sm" text="모든 프로젝트 보기 →" />
+            {history.length > 3 && (
+              <CoreButton buttonType="tertiary" size="sm"
+                text={showAllHistory ? '접기' : '모든 프로젝트 보기 →'}
+                onClick={() => setShowAllHistory(v => !v)} />
+            )}
           </Flex>
           <div className="ppt-recent__grid">
-            {[
-              { name: 'Q4 마케팅 전략', time: '2시간 전', slides: 12, gradient: true },
-              { name: '제품 런칭 로드맵', time: '1일 전', slides: 8, gradient: false },
-              { name: '브랜드 가이드라인 v2', time: '3일 전', slides: 24, gradient: true },
-            ].map((p, i) => (
-              <div key={i} className="ppt-recent-card" onClick={handleGenerate}>
-                <div className={`ppt-recent-card__thumb ${p.gradient ? 'ppt-recent-card__thumb--gradient' : ''}`}>
-                  {!p.gradient && <IconPptOutline size={32} color="var(--semantic-color-text-4)" />}
+            {displayHistory.length > 0 ? (
+              displayHistory.map((p, i) => (
+                <div key={p.id} className="ppt-recent-card" onClick={() => handleLoadPresentation(p)}>
+                  <div className={`ppt-recent-card__thumb ${i % 2 === 0 ? 'ppt-recent-card__thumb--gradient' : ''}`}>
+                    {i % 2 !== 0 && <IconPptOutline size={32} color="var(--semantic-color-text-4)" />}
+                  </div>
+                  <div className="ppt-recent-card__info">
+                    <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>{p.name}</Typo>
+                    <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)', marginTop: 2 }}>
+                      {formatTimeAgo(p.updatedAt)} · {p.slides.length} Slides
+                    </Typo>
+                  </div>
+                  <button className="ppt-recent-card__delete" onClick={(e) => { e.stopPropagation(); remove(p.id) }} title="삭제">
+                    <IconCloseOutline size={14} />
+                  </button>
                 </div>
-                <div className="ppt-recent-card__info">
-                  <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>{p.name}</Typo>
-                  <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)', marginTop: 2 }}>수정 {p.time} · {p.slides} Slides</Typo>
+              ))
+            ) : (
+              [
+                { name: 'Q4 마케팅 전략', time: '2시간 전', slides: 12, gradient: true },
+                { name: '제품 런칭 로드맵', time: '1일 전', slides: 8, gradient: false },
+                { name: '브랜드 가이드라인 v2', time: '3일 전', slides: 24, gradient: true },
+              ].map((p, i) => (
+                <div key={i} className="ppt-recent-card" onClick={handleGenerate}>
+                  <div className={`ppt-recent-card__thumb ${p.gradient ? 'ppt-recent-card__thumb--gradient' : ''}`}>
+                    {!p.gradient && <IconPptOutline size={32} color="var(--semantic-color-text-4)" />}
+                  </div>
+                  <div className="ppt-recent-card__info">
+                    <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>{p.name}</Typo>
+                    <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)', marginTop: 2 }}>수정 {p.time} · {p.slides} Slides</Typo>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
             <div className="ppt-recent-card ppt-recent-card--empty" onClick={handleGenerate}>
               <VStack style={{ alignItems: 'center', gap: 6 }}>
                 <IconAddOutline size={24} color="var(--semantic-color-text-4)" />
@@ -469,7 +785,7 @@ export default function PptGenerator() {
     const ci = steps.findIndex(s => s.key === state.status)
     return (
       <div className="ppt-page">
-        <GNB title="AI PPT Studio" showGenerate={false} />
+        <GNB title="AI PPT Studio" {...gnbProps} showGenerate={false} />
         <div className="ppt-generating">
           <Typo variant="$heading-3" style={{ color: 'var(--semantic-color-text-1)' }}>프레젠테이션을 제작하고 있습니다</Typo>
           <div className="ppt-generating__steps">
@@ -502,7 +818,7 @@ export default function PptGenerator() {
   if (state.status === 'ERROR') {
     return (
       <div className="ppt-page">
-        <GNB title="AI PPT Studio" showGenerate={false} />
+        <GNB title="AI PPT Studio" {...gnbProps} showGenerate={false} />
         <div className="ppt-generating">
           <Typo variant="$heading-4" style={{ color: 'var(--semantic-color-support-error-1)' }}>오류가 발생했습니다</Typo>
           <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-4)' }}>{state.error || '알 수 없는 오류'}</Typo>
@@ -516,11 +832,10 @@ export default function PptGenerator() {
   if (state.status === 'OUTLINE') {
     return (
       <div className="ppt-page">
-        <GNB title="AI PPT Studio" onGenerate={() => dispatch({ type: 'SET_STATUS', status: 'EDITING' })} />
+        <GNB title="AI PPT Studio" {...gnbProps} onGenerate={() => dispatch({ type: 'SET_STATUS', status: 'EDITING' })} />
         <div className="ppt-outline">
-          <IconSidebar active="slides" onChange={() => {}} />
+          <IconSidebar active={state.sidebarTab} onChange={(t) => dispatch({ type: 'SET_SIDEBAR', tab: t })} />
 
-          {/* 중앙: 아웃라인 목록 */}
           <div className="ppt-outline__main">
             <div className="ppt-outline__header">
               <VStack style={{ gap: 8 }}>
@@ -534,9 +849,14 @@ export default function PptGenerator() {
 
             {state.slides.map((slide, i) => (
               <div key={slide.id}
-                className={`ppt-outline__card ${i === state.activeSlideIndex ? 'ppt-outline__card--active' : ''}`}
-                onClick={() => dispatch({ type: 'SET_ACTIVE_SLIDE', index: i })}>
-                <IconDraggableFilled size={16} color="var(--semantic-color-text-5)" style={{ marginTop: 4 }} />
+                className={`ppt-outline__card ${i === state.activeSlideIndex ? 'ppt-outline__card--active' : ''} ${dragOverIdx === i ? 'ppt-outline__card--drop-target' : ''}`}
+                onClick={() => dispatch({ type: 'SET_ACTIVE_SLIDE', index: i })}
+                draggable
+                onDragStart={e => handleSlideDragStart(e, i)}
+                onDragOver={e => handleSlideDragOver(e, i)}
+                onDrop={e => handleSlideDrop(e, i)}
+                onDragEnd={handleSlideDragEnd}>
+                <IconDraggableFilled size={16} color="var(--semantic-color-text-5)" style={{ marginTop: 4, cursor: 'grab' }} />
                 <VStack style={{ gap: 6, flex: 1 }}>
                   <Flex style={{ alignItems: 'center', gap: 8 }}>
                     <Typo variant="$body-1" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>{slide.title}</Typo>
@@ -546,7 +866,13 @@ export default function PptGenerator() {
                     <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-3)' }}>{slide.summary}</Typo>
                   </Flex>
                 </VStack>
-                <button className="ppt-outline__card-edit"><IconMagicWandOutline size={16} /></button>
+                <button className="ppt-outline__card-edit"
+                  onClick={(e) => { e.stopPropagation(); handleOutlineMagic(i) }}
+                  disabled={outlineMagicIdx !== null}>
+                  {outlineMagicIdx === i
+                    ? <span className="ppt-outline__card-spinner" />
+                    : <IconMagicWandOutline size={16} />}
+                </button>
               </div>
             ))}
 
@@ -595,9 +921,9 @@ export default function PptGenerator() {
   /* ═══════ EDITING / COMPLETE ═══════ */
   return (
     <div className="ppt-page">
-      <GNB title="AI PPT Studio" onGenerate={() => setShowExport(true)} showGenerate={false} />
+      <GNB title="AI PPT Studio" {...gnbProps} onGenerate={() => setShowExport(true)} showGenerate={false} />
 
-      {/* 에디터 GNB 대체: 타이틀 + 액션 */}
+      {/* 에디터 GNB */}
       <div className="ppt-gnb" style={{ borderBottom: '1px solid var(--semantic-color-border-default)' }}>
         <div className="ppt-gnb__left">
           <Typo variant="$body-1" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>
@@ -606,7 +932,7 @@ export default function PptGenerator() {
           {state.status === 'COMPLETE' && <CoreTag tagType="primary" size="xs">완료</CoreTag>}
         </div>
         <div className="ppt-gnb__right">
-          <CoreButton buttonType="tertiary" size="sm" text="Share" />
+          <CoreButton buttonType="tertiary" size="sm" text={shareCopied ? '복사됨!' : 'Share'} onClick={handleShare} />
           <CoreButton buttonType="primary" size="sm" text="Export" onClick={() => setShowExport(true)} />
         </div>
       </div>
@@ -619,277 +945,112 @@ export default function PptGenerator() {
 
         {/* 슬라이드 패널 */}
         <div className="ppt-editor__panel">
-          <div className="ppt-editor__panel-header">
-            <Typo variant="$caption-1" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>{state.slides[0]?.title}</Typo>
-            <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)', marginTop: 2 }}>LAST EDITED 2M AGO</Typo>
-          </div>
-          <div className="ppt-editor__panel-slides">
-            {state.slides.map((slide, i) => (
-              <div key={slide.id} className={`ppt-thumb ${i === state.activeSlideIndex ? 'ppt-thumb--active' : ''}`}
-                onClick={() => dispatch({ type: 'SET_ACTIVE_SLIDE', index: i })}>
-                <span className="ppt-thumb__number">{String(i + 1).padStart(2, '0')}</span>
-                <div className="ppt-thumb__preview">
-                  <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600, fontSize: 9 }}>{slide.title}</Typo>
-                </div>
+          {state.sidebarTab === 'slides' ? (
+            <>
+              <div className="ppt-editor__panel-header">
+                <Typo variant="$caption-1" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>{state.slides[0]?.title}</Typo>
+                <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)', marginTop: 2 }}>LAST EDITED {formatTimeAgo(Date.now()).toUpperCase()}</Typo>
               </div>
-            ))}
-          </div>
-          <button className="ppt-panel__add" onClick={() => dispatch({ type: 'ADD_SLIDE' })}>
-            <IconAddOutline size={14} /> ADD SLIDE
-          </button>
+              <div className="ppt-editor__panel-slides">
+                {state.slides.map((slide, i) => (
+                  <div key={slide.id}
+                    className={`ppt-thumb ${i === state.activeSlideIndex ? 'ppt-thumb--active' : ''} ${dragOverIdx === i ? 'ppt-thumb--drop-target' : ''}`}
+                    onClick={() => dispatch({ type: 'SET_ACTIVE_SLIDE', index: i })}
+                    draggable
+                    onDragStart={e => handleSlideDragStart(e, i)}
+                    onDragOver={e => handleSlideDragOver(e, i)}
+                    onDrop={e => handleSlideDrop(e, i)}
+                    onDragEnd={handleSlideDragEnd}>
+                    <span className="ppt-thumb__number">{String(i + 1).padStart(2, '0')}</span>
+                    <div className="ppt-thumb__preview">
+                      <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600, fontSize: 9 }}>{slide.title}</Typo>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button className="ppt-panel__add" onClick={() => dispatch({ type: 'ADD_SLIDE' })}>
+                <IconAddOutline size={14} /> ADD SLIDE
+              </button>
+            </>
+          ) : (
+            <PptSidebarPanels
+              tab={state.sidebarTab}
+              slides={state.slides}
+              activeSlideIndex={state.activeSlideIndex}
+              activeSlide={activeSlide}
+              theme={state.theme}
+              themes={THEMES}
+              dispatch={dispatch}
+              attachedFiles={attachedFiles}
+              fetchedUrls={fetchedUrls}
+              selectedInfluencers={selectedInfluencers}
+              magicInput={magicInput}
+              setMagicInput={setMagicInput}
+              magicLoading={magicLoading}
+              onMagicEdit={handleMagicEdit}
+            />
+          )}
         </div>
 
         {/* 캔버스 영역 */}
-        <div className="ppt-editor__canvas-area">
-          <div className="ppt-canvas">
-            {activeSlide && (
-              <div className="ppt-canvas__slide">
-                <div className={`ppt-canvas__element ${state.selectedElementId === 'title' ? 'ppt-canvas__element--selected' : ''}`}
-                  onClick={() => dispatch({ type: 'SELECT_ELEMENT', id: 'title' })}>
-                  <Typo variant="$heading-4" style={{ color: 'var(--semantic-color-text-1)' }}>{activeSlide.title}</Typo>
-                  {activeSlide.type === 'title' && (
-                    <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-3)', marginTop: 4 }}>{activeSlide.summary}</Typo>
-                  )}
-                </div>
-
-                <VStack style={{ gap: 8, marginTop: 16, flex: 1 }}>
-                  {activeSlide.elements.map((el) => (
-                    <div key={el.id} className={`ppt-canvas__element ${state.selectedElementId === el.id ? 'ppt-canvas__element--selected' : ''}`}
-                      onClick={() => dispatch({ type: 'SELECT_ELEMENT', id: el.id })}>
-                      {el.kind === 'text' && <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-1)' }}>{el.content}</Typo>}
-                      {el.kind === 'kpi-grid' && el.data && (
-                        <div className="ppt-slide-kpi-grid">
-                          {(el.data as { label: string; value: string; sub: string }[]).map((k, ki) => (
-                            <div key={ki} className="ppt-slide-kpi">
-                              <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-3)' }}>{k.label}</Typo>
-                              <Typo variant="$heading-5" style={{ color: 'var(--semantic-color-text-1)', marginTop: 2 }}>{k.value}</Typo>
-                              <Typo variant="$caption-2" style={{ color: 'var(--global-colors-teal-70)', marginTop: 2 }}>{k.sub}</Typo>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {el.kind === 'bar-chart' && el.data && (
-                        <VStack style={{ gap: 6, marginTop: 8 }}>
-                          {(el.data as { label: string; value: number; pct: number; color: string }[]).map((b, bi) => (
-                            <div key={bi} className="ppt-slide-bar">
-                              <div className="ppt-slide-bar__label">
-                                <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 500 }}>{b.label}</Typo>
-                              </div>
-                              <div className="ppt-slide-bar__track">
-                                <div className="ppt-slide-bar__fill" style={{ width: `${b.pct}%`, background: b.color }} />
-                              </div>
-                              <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-3)', width: 60, textAlign: 'right', flexShrink: 0 }}>{formatNum(b.value)}</Typo>
-                            </div>
-                          ))}
-                        </VStack>
-                      )}
-                      {el.kind === 'list' && el.data && (
-                        <VStack style={{ gap: 6 }}>
-                          {(el.data as { text: string }[]).map((item, li) => (
-                            <Flex key={li} style={{ gap: 8, alignItems: 'flex-start' }}>
-                              <Typo variant="$body-2" style={{ color: 'var(--global-colors-primary-60)', fontWeight: 700, flexShrink: 0 }}>{li + 1}.</Typo>
-                              <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-1)' }}>{item.text}</Typo>
-                            </Flex>
-                          ))}
-                        </VStack>
-                      )}
-                    </div>
-                  ))}
-                </VStack>
-
-                {activeSlide.type === 'title' && (
-                  <Flex style={{ justifyContent: 'flex-end', marginTop: 'auto' }}>
-                    <CoreTag tagType="gray" size="xs">Confidential Internal Report</CoreTag>
-                  </Flex>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Magic Edit Bar */}
-          <div className="ppt-magic-bar">
-            <IconAiLavelOutline size={20} color="var(--global-colors-primary-60)" />
-            <input className="ppt-magic-bar__input" placeholder="더 간결하게 만들거나 핵심 성과를 강조해줘..."
-              value={magicInput} onChange={e => setMagicInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleMagicEdit()} />
-            <CoreButton buttonType="contrast" size="sm" text="MAGIC EDIT" onClick={handleMagicEdit} />
-          </div>
-
-          {/* Zoom Bar */}
-          <div className="ppt-zoom-bar">
-            <button className="ppt-zoom-bar__btn"><IconSubtractOutline size={14} /></button>
-            <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-3)', width: 40, textAlign: 'center' }}>85%</Typo>
-            <button className="ppt-zoom-bar__btn"><IconAddOutline size={14} /></button>
-            <button className="ppt-zoom-bar__btn" style={{ marginLeft: 8 }}><IconZoomInAreaOutline size={14} /></button>
-          </div>
-        </div>
+        <PptCanvas
+          activeSlide={activeSlide}
+          activeSlideIndex={state.activeSlideIndex}
+          selectedElementId={state.selectedElementId}
+          theme={state.theme}
+          dispatch={dispatch}
+          editingField={editingField}
+          setEditingField={setEditingField}
+          magicInput={magicInput}
+          setMagicInput={setMagicInput}
+          magicLoading={magicLoading}
+          onMagicEdit={handleMagicEdit}
+        />
 
         {/* Inspector */}
-        <div className="ppt-inspector">
-          <div className="ppt-inspector__header">
-            <Typo variant="$body-1" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>
-              {state.selectedElementId === 'title' ? '슬라이드 속성' :
-                state.selectedElementId ? '요소 속성' : '슬라이드 속성'}
-            </Typo>
-          </div>
-
-          <div className="ppt-inspector__body">
-            {/* 차트 속성 (차트 슬라이드일 때) */}
-            {activeSlide?.type === 'chart' && (
-              <>
-                <div>
-                  <div className="ppt-inspector__section-title">LAYOUT & STYLE</div>
-                  <div className="ppt-style-options">
-                    <div className="ppt-style-option ppt-style-option--active">
-                      <IconChartBarOutline size={20} color="var(--global-colors-primary-60)" />
-                      <Typo variant="$caption-2" style={{ marginTop: 4, color: 'var(--semantic-color-text-1)' }}>Bar Chart</Typo>
-                    </div>
-                    <div className="ppt-style-option">
-                      <IconDataOutline size={20} color="var(--semantic-color-text-3)" />
-                      <Typo variant="$caption-2" style={{ marginTop: 4, color: 'var(--semantic-color-text-3)' }}>Line Chart</Typo>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <div className="ppt-inspector__section-title">DATA FILTERS</div>
-                  <VStack style={{ gap: 8 }}>
-                    <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-3)' }}>Time Range</Typo>
-                    <select className="ppt-inspector__input" defaultValue="3m">
-                      <option value="1m">Last 1 Month</option>
-                      <option value="3m">Last 3 Months</option>
-                      <option value="6m">Last 6 Months</option>
-                    </select>
-                    <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-3)', marginTop: 4 }}>Metric</Typo>
-                    <Flex style={{ gap: 6 }}>
-                      <CoreTag tagType="primary" size="xs">Total Reach</CoreTag>
-                      <CoreTag tagType="gray" size="xs">Conversions</CoreTag>
-                    </Flex>
-                  </VStack>
-                </div>
-              </>
-            )}
-
-            {/* 텍스트 속성 */}
-            {(state.selectedElementId === 'title' || (state.selectedElementId && activeSlide?.elements.find(e => e.id === state.selectedElementId)?.kind === 'text')) && (
-              <>
-                <div>
-                  <div className="ppt-inspector__section-title">TEXT SETTINGS</div>
-                  <VStack style={{ gap: 8 }}>
-                    <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-3)' }}>Font Family</Typo>
-                    <select className="ppt-inspector__input" defaultValue="pretendard">
-                      <option value="pretendard">Pretendard</option>
-                      <option value="inter">Inter</option>
-                    </select>
-                    <Flex style={{ gap: 8 }}>
-                      <VStack style={{ gap: 4, flex: 1 }}>
-                        <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-3)' }}>Weight</Typo>
-                        <select className="ppt-inspector__input" defaultValue="bold">
-                          <option value="normal">Regular</option>
-                          <option value="600">Semibold</option>
-                          <option value="bold">Bold</option>
-                        </select>
-                      </VStack>
-                      <VStack style={{ gap: 4, flex: 1 }}>
-                        <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-3)' }}>Size</Typo>
-                        <input className="ppt-inspector__input" type="text" defaultValue="24px" />
-                      </VStack>
-                    </Flex>
-                  </VStack>
-                </div>
-                {state.selectedElementId === 'title' && activeSlide && (
-                  <div>
-                    <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-3)', marginBottom: 6 }}>제목 편집</Typo>
-                    <input className="ppt-inspector__input" style={{ width: '100%' }} value={activeSlide.title}
-                      onChange={e => dispatch({ type: 'UPDATE_SLIDE_TITLE', slideIndex: state.activeSlideIndex, title: e.target.value })} />
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* 테마 색상 */}
-            <div>
-              <div className="ppt-inspector__section-title">VISUAL THEME</div>
-              <div className="ppt-color-swatches">
-                {THEMES.slice(0, 5).map(t => (
-                  <div key={t.id} className={`ppt-swatch ${state.theme.id === t.id ? 'ppt-swatch--active' : ''}`}
-                    style={{ background: t.primary }} onClick={() => dispatch({ type: 'SET_THEME', theme: t })} />
-                ))}
-                <Typo variant="$caption-2" style={{ color: 'var(--global-colors-primary-60)', fontWeight: 600, cursor: 'pointer', marginLeft: 4 }}
-                  onClick={() => setShowTheme(true)}>EDIT</Typo>
-              </div>
-            </div>
-
-            {/* AI Suggestion */}
-            <div className="ppt-ai-suggest">
-              <Flex style={{ alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <IconAiLavelOutline size={14} color="var(--global-colors-primary-60)" />
-                <Typo variant="$caption-1" style={{ fontWeight: 700, color: 'var(--global-colors-primary-60)', textTransform: 'uppercase' as const }}>AI SUGGESTION</Typo>
-              </Flex>
-              <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-2)', lineHeight: 1.5 }}>
-                "Q4 데이터가 강한 상승 추세를 보이고 있습니다. 현재 성장률 기반으로 <strong>Q1 예측선</strong>을 추가하시겠습니까?"
-              </Typo>
-              <CoreButton buttonType="primary" size="sm" text="APPLY SUGGESTION" style={{ width: '100%', marginTop: 10 }} />
-            </div>
-          </div>
-
-          <div className="ppt-inspector__footer">
-            <CoreButton buttonType="tertiary" size="sm" text="RESET" style={{ flex: 1 }} />
-            <CoreButton buttonType="primary" size="sm" text="UPDATE SLIDE" style={{ flex: 1 }} />
-          </div>
-        </div>
+        <PptInspector
+          activeSlide={activeSlide}
+          activeSlideIndex={state.activeSlideIndex}
+          selectedElementId={state.selectedElementId}
+          theme={state.theme}
+          themes={THEMES}
+          dispatch={dispatch}
+          onShowTheme={() => setShowTheme(true)}
+          onApplySuggestion={handleApplySuggestion}
+          originalSlides={originalSlidesRef.current}
+        />
       </div>
 
       {/* 테마 모달 */}
       {showTheme && (
-        <div className="ppt-overlay" onClick={() => setShowTheme(false)}>
-          <div className="ppt-modal" onClick={e => e.stopPropagation()}>
-            <Flex style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <Typo variant="$heading-5" style={{ color: 'var(--semantic-color-text-1)' }}>테마 선택</Typo>
-              <button className="ppt-gnb__icon-btn" onClick={() => setShowTheme(false)}><IconCloseOutline size={20} /></button>
-            </Flex>
-            <div className="ppt-theme-grid">
-              {THEMES.map(t => (
-                <div key={t.id} className={`ppt-theme-card ${state.theme.id === t.id ? 'ppt-theme-card--active' : ''}`}
-                  onClick={() => { dispatch({ type: 'SET_THEME', theme: t }); setShowTheme(false) }}>
-                  <div className="ppt-theme-preview">
-                    <div className="ppt-theme-swatch" style={{ background: t.primary }} />
-                    <div className="ppt-theme-swatch" style={{ background: t.secondary }} />
-                    <div className="ppt-theme-swatch" style={{ background: t.accent }} />
-                  </div>
-                  <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-1)', fontWeight: 600 }}>{t.name}</Typo>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <PptThemeModal
+          themes={THEMES}
+          currentTheme={state.theme}
+          onSelect={(t) => dispatch({ type: 'SET_THEME', theme: t })}
+          onClose={() => setShowTheme(false)}
+        />
       )}
 
       {/* 내보내기 모달 */}
       {showExport && (
-        <div className="ppt-overlay" onClick={() => setShowExport(false)}>
-          <div className="ppt-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 440 }}>
-            <Flex style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <Typo variant="$heading-5" style={{ color: 'var(--semantic-color-text-1)' }}>내보내기</Typo>
-              <button className="ppt-gnb__icon-btn" onClick={() => setShowExport(false)}><IconCloseOutline size={20} /></button>
-            </Flex>
-            <div className="ppt-export-checklist">
-              <div className="ppt-side-card__title">사전 체크리스트</div>
-              {['맞춤법 확인 완료', '브랜드 색상 일관성 확인', '데이터 정확성 확인'].map(c => (
-                <div key={c} className="ppt-export-check">
-                  <IconCheckCircleFilled size={16} color="var(--global-colors-teal-70)" />
-                  <Typo variant="$body-2" style={{ color: 'var(--semantic-color-text-1)' }}>{c}</Typo>
-                </div>
-              ))}
-            </div>
-            <div style={{ borderTop: '1px solid var(--semantic-color-border-default)', paddingTop: 16 }}>
-              <Flex style={{ gap: 8 }}>
-                <CoreButton buttonType="primary" size="md" text="PPTX 다운로드" onClick={() => handleExport('pptx')} style={{ flex: 1 }} />
-                <CoreButton buttonType="tertiary" size="md" text="PDF 다운로드" onClick={() => handleExport('pdf')} style={{ flex: 1 }} />
-              </Flex>
-            </div>
-          </div>
-        </div>
+        <PptExportModal
+          exporting={exporting}
+          onExport={handleExport}
+          onClose={() => setShowExport(false)}
+        />
       )}
     </div>
   )
+}
+
+/* ═══════ 유틸리티 ═══════ */
+
+function formatTimeAgo(timestamp: number): string {
+  const diff = Date.now() - timestamp
+  const minutes = Math.floor(diff / 60000)
+  if (minutes < 60) return `${minutes}분 전`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}시간 전`
+  const days = Math.floor(hours / 24)
+  return `${days}일 전`
 }
