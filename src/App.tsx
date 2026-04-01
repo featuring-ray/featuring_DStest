@@ -14,6 +14,7 @@ import FeedbackConverter from './FeedbackConverter'
 import RemindScheduler from './RemindScheduler'
 import ContentReviewer from './ContentReviewer'
 import ReportGenerator from './ReportGenerator'
+import PptGenerator from './PptGenerator'
 import CreativeBrief from './CreativeBrief'
 import DocumentVerification from './DocumentVerification'
 import DeliveryTracker from './DeliveryTracker'
@@ -221,6 +222,7 @@ export default function App() {
           <Route path="/feedback-converter" element={<FeedbackConverter />} />
           <Route path="/remind-scheduler" element={<RemindScheduler />} />
           <Route path="/content-reviewer" element={<ContentReviewer />} />
+          <Route path="/ppt-generator" element={<PptGenerator />} />
           <Route path="/report-generator" element={<ReportGenerator />} />
           <Route path="/creative-brief" element={<CreativeBrief />} />
           <Route path="/document-verification" element={<DocumentVerification />} />

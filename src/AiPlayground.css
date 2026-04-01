@@ -27,6 +27,16 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
+.ai-playground__card--highlight {
+  background: linear-gradient(135deg, var(--global-colors-primary-10) 0%, var(--global-colors-indigo-10, #eef2ff) 100%);
+  border-color: var(--global-colors-primary-40);
+}
+
+.ai-playground__card--highlight:hover {
+  border-color: var(--global-colors-primary-60);
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.12);
+}
+
 .ai-playground__card--empty {
   display: flex;
   align-items: center;

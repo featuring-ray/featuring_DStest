@@ -11,11 +11,20 @@ interface PlaygroundCard {
   tag: string
   tagType: 'primary' | 'gray'
   path: string
+  highlight?: boolean
 }
 
 // ==================== 데이터 ====================
 
 const PLAYGROUND_CARDS: PlaygroundCard[] = [
+  {
+    title: 'AI PPT 생성',
+    description: '캠페인/인플루언서 데이터를 분석하여 인사이트·차트·전략 제언이 포함된 프레젠테이션을 자동 생성하고 편집합니다.',
+    tag: 'NEW',
+    tagType: 'primary',
+    path: '/ppt-generator',
+    highlight: true,
+  },
   {
     title: '콘텐츠 기반 탐색',
     description: 'AI로 트렌드를 스캔하고, 톤 기반 크리에이터를 발굴하며, 성과 패턴을 학습합니다.',
@@ -127,7 +136,7 @@ export default function AiPlayground() {
         {PLAYGROUND_CARDS.map((card) => (
           <Box
             key={card.path}
-            className="ai-playground__card"
+            className={`ai-playground__card${card.highlight ? ' ai-playground__card--highlight' : ''}`}
             onClick={() => navigate(card.path)}
           >
             <Flex style={{ alignItems: 'center', gap: 8, marginBottom: 8 }}>
