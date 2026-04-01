@@ -8,7 +8,6 @@ import {
   IconPptOutline,
   IconLinkOutline,
   IconDocumentOutline,
-  IconRefreshOutline,
   IconAddOutline,
   IconCloseOutline,
   IconChartBarOutline,
@@ -16,8 +15,6 @@ import {
   IconTuneOutline,
   IconWidgetOutline,
   IconMagicWandOutline,
-  IconArrowRightOutline,
-  IconShareTrayOutline,
   IconCheckCircleFilled,
   IconSubtractOutline,
   IconZoomInAreaOutline,
@@ -97,7 +94,6 @@ const CAMPAIGNS = [
 ]
 
 const QUICK_PROMPTS = ['캠페인 성과 리포트', '인플루언서 분석', '제안서 초안', '월간 트렌드 리포트']
-const MAGIC_CHIPS = ['더 간결하게', '핵심만 강조', '톤 변경: 임원용', '그래프 추가']
 
 function generateMockSlides(): Slide[] {
   return [
@@ -347,8 +343,7 @@ export default function PptGenerator() {
 
               <div className="ppt-engine-card__actions">
                 <button className="ppt-gnb__icon-btn" title="파일 첨부"><IconDocumentOutline size={18} /></button>
-                <CoreButton buttonType="primary" size="md" text="프레젠테이션 생성" onClick={handleGenerate}
-                  iconAfter={<IconArrowRightOutline size={16} />} />
+                <CoreButton buttonType="primary" size="md" text="프레젠테이션 생성 →" onClick={handleGenerate} />
               </div>
 
               <div className="ppt-engine-card__chips">
@@ -434,7 +429,7 @@ export default function PptGenerator() {
               <Typo variant="$heading-4" style={{ color: 'var(--semantic-color-text-1)' }}>최근 프레젠테이션</Typo>
               <Typo variant="$caption-2" style={{ color: 'var(--semantic-color-text-4)' }}>이전 작업을 이어가거나 스타일을 복제하세요.</Typo>
             </VStack>
-            <CoreButton buttonType="tertiary" size="sm" text="모든 프로젝트 보기" iconAfter={<IconArrowRightOutline size={14} />} />
+            <CoreButton buttonType="tertiary" size="sm" text="모든 프로젝트 보기 →" />
           </Flex>
           <div className="ppt-recent__grid">
             {[
@@ -534,8 +529,7 @@ export default function PptGenerator() {
                   AI가 "{CAMPAIGNS.find(c => c.value === targetId)?.label}" 분석을 위한 전략적 구성을 생성했습니다. 슬라이드 흐름과 요약을 검토하세요.
                 </Typo>
               </VStack>
-              <CoreButton buttonType="secondary" size="md" text="아웃라인 재생성"
-                iconBefore={<IconRefreshOutline size={16} />} onClick={handleGenerate} />
+              <CoreButton buttonType="secondary" size="md" text="↻ 아웃라인 재생성" onClick={handleGenerate} />
             </div>
 
             {state.slides.map((slide, i) => (
@@ -561,8 +555,7 @@ export default function PptGenerator() {
             </div>
 
             <Flex style={{ justifyContent: 'flex-end', marginTop: 24, gap: 8 }}>
-              <CoreButton buttonType="primary" size="md" text="슬라이드 편집 시작"
-                iconAfter={<IconArrowRightOutline size={16} />}
+              <CoreButton buttonType="primary" size="md" text="슬라이드 편집 시작 →"
                 onClick={() => dispatch({ type: 'SET_STATUS', status: 'EDITING' })} />
             </Flex>
           </div>
@@ -613,7 +606,7 @@ export default function PptGenerator() {
           {state.status === 'COMPLETE' && <CoreTag tagType="primary" size="xs">완료</CoreTag>}
         </div>
         <div className="ppt-gnb__right">
-          <CoreButton buttonType="tertiary" size="sm" text="Share" iconBefore={<IconShareTrayOutline size={14} />} />
+          <CoreButton buttonType="tertiary" size="sm" text="Share" />
           <CoreButton buttonType="primary" size="sm" text="Export" onClick={() => setShowExport(true)} />
         </div>
       </div>
