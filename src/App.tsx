@@ -19,6 +19,7 @@ import CreativeBrief from './CreativeBrief'
 import DocumentVerification from './DocumentVerification'
 import DeliveryTracker from './DeliveryTracker'
 import ScheduleCalculator from './ScheduleCalculator'
+import MarketLandscape from './MarketLandscape'
 import { Box, Flex, VStack, Typo, Center, CoreTag } from '@featuring-corp/components'
 import {
   IconDashboardOutline,
@@ -228,6 +229,7 @@ export default function App() {
           <Route path="/document-verification" element={<DocumentVerification />} />
           <Route path="/delivery-tracker" element={<DeliveryTracker />} />
           <Route path="/schedule-calculator" element={<ScheduleCalculator />} />
+          <Route path="/market-landscape" element={<MarketLandscape />} />
           <Route path="*" element={<Dashboard />} />
         </Routes>
       </Box>

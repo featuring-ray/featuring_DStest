@@ -18,12 +18,19 @@ interface PlaygroundCard {
 
 const PLAYGROUND_CARDS: PlaygroundCard[] = [
   {
+    title: '마켓 랜드스케이프',
+    description: '뷰티 소셜 미디어 시장을 5개 차원 × 3개 지표로 분석하고, 브랜드별 심층 비교 인사이트를 제공합니다.',
+    tag: 'NEW',
+    tagType: 'primary',
+    path: '/market-landscape',
+    highlight: true,
+  },
+  {
     title: 'AI PPT 생성',
     description: '캠페인/인플루언서 데이터를 분석하여 인사이트·차트·전략 제언이 포함된 프레젠테이션을 자동 생성하고 편집합니다.',
     tag: 'NEW',
     tagType: 'primary',
     path: '/ppt-generator',
-    highlight: true,
   },
   {
     title: '콘텐츠 기반 탐색',
@@ -96,8 +103,8 @@ const PLAYGROUND_CARDS: PlaygroundCard[] = [
     path: '/content-reviewer',
   },
   {
-    title: '캠페인 리포트 생성',
-    description: '성과 데이터를 분석하여 인사이트·벤치마크·향후 제언이 포함된 PPT 스타일 리포트를 생성합니다.',
+    title: '캠페인 결과 보고서 생성',
+    description: '캠페인 ID를 선택하면 AI가 20장 내외의 결과 보고서 PPT를 자동 생성합니다. 데이터 테이블, 댓글 분석, 인사이트까지 포함됩니다.',
     tag: 'AI',
     tagType: 'primary',
     path: '/report-generator',
